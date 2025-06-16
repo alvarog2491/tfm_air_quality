@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # Spanish Multi-Source Data Pipeline
 
 A complete data processing pipeline that brings together air quality,
@@ -20,7 +14,7 @@ further analysis or machine learning tasks.
 -   [Province Name Standardization](#province-name-standardization)
 -   [Output](#output)
 
-## Description {#description}
+## Description
 
 This pipeline builds a unified dataset combining three key types of
 data:
@@ -33,7 +27,7 @@ data:
 All records are standardized to share the same structure with `Province`
 and `Year` as primary keys.
 
-## Data Sources {#data-sources}
+## Data Sources
 
 ### Air Quality
 
@@ -54,7 +48,7 @@ and `Year` as primary keys.
 
 -   GDP per capita data from 2000 to 2022 by province.
 
-## Data Processing Pipeline {#data-processing-pipeline}
+## Data Processing Pipeline
 
 The pipeline runs in four phases:
 
@@ -135,7 +129,7 @@ OUTPUT: Normalized long format
 Combines the outputs of the above processors into one single, unified
 dataset.
 
-## Usage {#usage}
+## Usage
 
 ### Run Everything
 
@@ -164,7 +158,7 @@ from processors.DataMerger import DataMerger
 DataMerger().process()
 ```
 
-## Main Orchestrator {#main-orchestrator}
+## Main Orchestrator
 
 The script `main.py` controls the full workflow.
 
@@ -176,7 +170,7 @@ Logs are printed to the console and include: - Start/End messages for
 each step - Number of rows and columns in the result - Time taken - Any
 errors with full tracebacks
 
-## Province Name Standardization {#province-name-standardization}
+## Province Name Standardization
 
 Names like `"02 Albacete"` or `"Alicante/Alacant"` are cleaned up using
 a mapping defined in a JSON file, so merging data from different sources
@@ -187,7 +181,7 @@ works smoothly.
 - `"Alicante/Alacant"` → `"Alicante"`\
 - `"A Coruña"` → `"A Coruña"`
 
-## Output {#output}
+## Output
 
 The final result is saved to:
 
