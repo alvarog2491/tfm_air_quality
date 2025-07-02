@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Main orchestrator for data processing
-Automatically runs all data processing pipelines
+Main orchestrator for data processing.
+Automatically runs all data processing pipelines.
 """
 
 import sys
@@ -15,8 +15,10 @@ setup_logger()
 
 def setup_project_structure():
     """
-    Checks if required project folders exist relative to main.py location.
-    Only creates 'data/output' if it doesn't exist.
+    Check if required project folders exist and create output directory.
+    
+    Raises:
+        FileNotFoundError: If required data directories are missing.
     """
     root_path = Path(__file__).resolve().parent
     data_path = root_path / "data"
@@ -43,10 +45,16 @@ def setup_project_structure():
     logging.info("Project structure verified")
 
 
-
-
 def run_data_processing():
-    """Runs all data processing pipelines"""
+    """
+    Run all data processing pipelines and merge results.
+    
+    Returns:
+        pandas.DataFrame: Final merged dataset.
+        
+    Raises:
+        Exception: If any processing step fails.
+    """
     try:
         # Step 1: Process air quality data
         logging.info("============ Starting air quality data processing ============")
@@ -96,7 +104,12 @@ def run_data_processing():
         raise
 
 def main():
-    """Main function"""
+    """
+    Main function that orchestrates the entire data processing workflow.
+    
+    Raises:
+        SystemExit: If processing fails.
+    """
     print("🚀 Starting automated data processing...")
     print("=" * 60)
     
