@@ -58,11 +58,17 @@ The pipeline runs in four phases:
 Reads pollutant data and adds a classification column based on thresholds.
 
 **Input**: `"air_quality_with_province.csv"`  
-**Output**: Same + air quality classification  
+**Output**: Same + air quality classification
 
-| Air Pollutant | Year | Province | Air Pollution Level | Quality |
-|---------------|------|----------|----------------------|---------|
-| NO2           | 1991 | Madrid   | 80.639               | RAZONABLEMENTE BUENA |
+| Air Pollutant | Air Pollutant Description | Data Aggregation Process      | Year       | Air Pollution Level | Unit Of Air Pollution Level |
+| ------------- | ------------------------- | ----------------------------- | ---------- | ------------------- | --------------------------- |
+| no2           | Nitrogen dioxide (air)    | Annual mean / 1 calendar year | 1991-01-01 | 80.639              | ug/m3                       |
+
+
+| Air Quality Station Type | Air Quality Station Area | Longitude | Latitude | Altitude | Province | Quality              |
+| ------------------------ | ------------------------ | --------- | -------- | -------- | -------- | -------------------- |
+| Background               | urban                    | -3.705    | 40.347   | 593.000  | Madrid   | RAZONABLEMENTE BUENA |
+
 
 ---
 
