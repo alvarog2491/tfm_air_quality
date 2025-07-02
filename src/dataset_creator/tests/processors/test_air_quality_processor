@@ -1,0 +1,147 @@
+import pytest
+from pathlib import Path
+from unittest.mock import patch, MagicMock
+import pandas as pd
+import numpy as np
+from processors.AirQualityProcessor import AirQualityProcessor
+
+# Test data
+TEST_DATA = {
+    "Air Pollutant": ["no2", "pm10", "unknown_pollutant"],
+    "Air Pollution Level": [80.639, 50.0, 30.0],
+    "Province": ["Madrid", "Barcelona", "Valencia"],
+    "Unit Of Air Pollution Level": ["ug/m3", "ug/m3", "ug/m3"],
+    "Air Quality Station Type": ["Background", "Background", "Background"],
+    "Air Quality Station Area": ["urban", "urban", "urban"],
+    "Altitude": [593.0, 12.0, 15.0],
+    "Longitude": [-3.7038, 2.1734, -0.3774],
+    "Latitude": [40.4168, 41.3851, 39.4699]
+}
+
+@pytest.fixture
+def processor(tmp_path):
+    """Fixture providing an AirQualityProcessor instance with a temporary data folder."""
+    data_folder = tmp_path / "data"
+    data_folder.mkdir()
+    raw_folder = data_folder / "raw"
+    raw_folder.mkdir()
+    
+    # Create test CSV file
+    df = pd.DataFrame(TEST_DATA)
+    df.to_csv(raw_folder / "air_quality_with_province.csv", index=False)
+    
+    return AirQualityProcessor(data_folder)
+
+class TestAirQualityProcessor:
+    def test_init(self, processor):
+        """Test initialization with custom data folder."""
+        assert processor.data_folder.name == "data"
+        assert processor._air_quality_df is None
+
+    def test_is_loaded(self, processor):
+        """Test is_loaded property."""
+        assert not processor.is_loaded
+        processor._air_quality_df = pd.DataFrame()
+        assert processor.is_loaded
+
+    def test_load_csv_files_success(self, processor):
+        """Test successful loading of CSV files."""
+        processor.load_csv_files()
+        assert processor.is_loaded
+        assert isinstance(processor.air_quality_df, pd.DataFrame)
+        assert len(processor.air_quality_df) == 3
+
+    def test_load_csv_files_missing_file(self, tmp_path):
+        """Test loading when file is missing."""
+        processor = AirQualityProcessor(tmp_path)
+        with pytest.raises(FileNotFoundError):
+            processor.load_csv_files()
+
+    def test_classify_quality(self, processor):
+        """Test quality classification."""
+        processor.load_csv_files()
+        processor.classify_quality()
+        
+        df = processor.air_quality_df
+        assert "Quality" in df.columns
+        assert df["Quality"].dtype.name == "category"
+        
+        # Check known pollutants are classified
+        no2_row = df[df["Air Pollutant"] == "no2"].iloc[0]
+        assert no2_row["Quality"] in ["BUENA", "RAZONABLEMENTE BUENA", "MEJORABLE", "MALA"]
+        
+        # Check unknown pollutant
+        unknown_row = df[df["Air Pollutant"] == "unknown_pollutant"].iloc[0]
+        assert unknown_row["Quality"] == "UNKNOWN"
+
+    def test_classify_quality_before_load(self, processor):
+        """Test classification attempt before loading data."""
+        with pytest.raises(ValueError):
+            processor.classify_quality()
+
+    @patch("processors.AirQualityProcessor.ProvinceMapper")
+    def test_map_province_names(self, mock_mapper, processor):
+        """Test province name mapping."""
+        mock_mapper.map_province_name.return_value = pd.DataFrame(TEST_DATA)
+        
+        processor.load_csv_files()
+        processor.map_province_names()
+        
+        mock_mapper.map_province_name.assert_called_once_with(
+            "Air quality", processor.air_quality_df
+        )
+
+    def test_save_processed_file(self, processor, tmp_path):
+        """Test saving processed file."""
+        processor.load_csv_files()
+        processor.classify_quality()
+        
+        processed_path = tmp_path / "data" / "processed" / "air_quality.csv"
+        assert not processed_path.exists()
+        
+        processor.save_processed_file()
+        assert processed_path.exists()
+        
+        # Verify saved content
+        saved_df = pd.read_csv(processed_path)
+        assert len(saved_df) == 3
+        assert "Quality" in saved_df.columns
+
+    def test_save_processed_file_no_data(self, processor):
+        """Test saving when no data is available."""
+        with pytest.raises(ValueError):
+            processor.save_processed_file()
+
+    def test_process_full_pipeline(self, processor, tmp_path):
+        """Test complete processing pipeline."""
+        processor.process()
+        
+        # Verify output file exists
+        processed_path = tmp_path / "data" / "processed" / "air_quality.csv"
+        assert processed_path.exists()
+        
+        # Verify content
+        saved_df = pd.read_csv(processed_path)
+        assert len(saved_df) == 3
+        assert "Quality" in saved_df.columns
+
+    @patch("processors.AirQualityProcessor.AirQualityProcessor.load_csv_files")
+    def test_process_error_handling(self, mock_load, processor, caplog):
+        """Test error handling in process method."""
+        mock_load.side_effect = Exception("Test error")
+        
+        with pytest.raises(Exception):
+            processor.process()
+        
+        assert "Error in processing pipeline: Test error" in caplog.text
+
+    def test_column_dtypes(self, processor):
+        """Test that loaded DataFrame has correct dtypes."""
+        processor.load_csv_files()
+        df = processor.air_quality_df
+        
+        # Check some key dtypes
+        assert df["Air Pollutant"].dtype.name == "category"
+        assert df["Air Pollution Level"].dtype.name == "float64"
+        assert df["Province"].dtype.name == "category"
+        assert df["Altitude"].dtype.name == "float64"
