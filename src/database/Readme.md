@@ -1,18 +1,18 @@
 # 🌍 Spanish Multi-Source Data Pipeline
 
-A complete data processing pipeline that brings together **air quality**, **health**, and **socioeconomic** data from Spanish provinces — all ready for analysis or machine learning tasks.
+A complete data processing pipeline that integrates **air quality**, **health**, and **socioeconomic** data from official sources in CSV format across Spanish provinces. The pipeline processes and combines this data into a unified, clean dataset ready for analysis or machine learning tasks.
 
 ---
 
 ## 📚 Table of Contents
 
-- 📄 [Description](#description)
-- 📊 [Data Sources](#data-sources)
-- ⚙️ [Data Processing Pipeline](#data-processing-pipeline)
-- 🚀 [Usage](#usage)
-- 🧠 [Main Orchestrator](#main-orchestrator)
-- 🧼 [Province Name Standardization](#province-name-standardization)
-- 📁 [Output](#output)
+- 📄 [Description](#-description)
+- 📊 [Data Sources](#-data-sources)
+- ⚙️ [Data Processing Pipeline](#-data-processing-pipeline)
+- 🚀 [Usage](#-usage)
+- 🧠 [Main Orchestrator](#-main-orchestrator)
+- 🧼 [Province Name Standardization](#-province-name-standardization)
+- 📁 [Output](#-output)
 
 ---
 
@@ -30,11 +30,15 @@ All records are standardized to share the same structure, using `Province` and `
 
 ## 📊 Data Sources
 
+All CSV files have been downloaded from the official links listed below. The raw data for each category can be found in the corresponding folder under data/*type*/raw/.
+For example, air pollution data is located at:
+data/air_quality_data/raw/
+
 ### Air Quality
 
 - [EEA (European Environment Agency)](https://discomap.eea.europa.eu/App/AQViewer/index.html?fqn=Airquality_Dissem.b2g.AirQualityStatistics&Country=Spain&inAQReportYN=Yes):  
   Data for PM2.5, PM10, NO2, SO2, O3  
-- BOE: Classification of air quality into 6 categories (from "buena" to "extremadamente desfavorable")
+- [BOE](https://www.boe.es/buscar/doc.php?id=BOE-A-2020-10426): Classification of air quality into 6 categories (from "buena" to "extremadamente desfavorable")
 
 ### Health
 
@@ -45,7 +49,7 @@ All records are standardized to share the same structure, using `Province` and `
 
 ### Socioeconomic
 
-- GDP per capita by province from 2000 to 2022
+- [GDP](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736167628&menu=resultados&idp=1254735576581#_tabs-1254736158133) per capita by province from 2000 to 2022
 
 ---
 
@@ -55,7 +59,7 @@ The pipeline runs in four phases:
 
 ### 1️⃣ Air Quality
 
-Reads pollutant data and adds a classification column based on thresholds.
+Reads pollutant data and adds a classification column based on thresholds, collected from BOE.
 
 **Input**: `"air_quality_with_province.csv"`  
 **Output**: Same + air quality classification
@@ -112,7 +116,7 @@ Merges the outputs of the previous processors into a single, unified dataset.
 ### Run Everything
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 This will:  
@@ -187,7 +191,9 @@ The final dataset is saved to:
 - **Unit**: Measurement unit (e.g., µg/m³)  
 - **Air_Quality_Station_Type**: Station type (e.g., background)  
 - **Air_Quality_Station_Area**: Area type (e.g., urban)  
-- **Altitude**: Elevation of station (in meters)  
+- **Altitude**: Elevation of station (in meters)
+- **Longitude**: Geographic coordinate specifying east-west position of the station
+- **Latitude**: Geographic coordinate specifying north-south position of the station
 - **Quality**: Air quality rating  
 - **Respiratory_Diseases_Total**: Total respiratory-related deaths  
 - **Life_Expectancy**: Average life expectancy  
