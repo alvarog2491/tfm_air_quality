@@ -59,6 +59,8 @@ class AirQualityProcessor(BaseProcessor):
         'Air Quality Station Type': 'category',
         'Air Quality Station Area': 'category',
         'Altitude': 'float64',
+        'Longitude':'float64',
+        'Latitude':'float64',
         'Province': 'category',
     }
 
