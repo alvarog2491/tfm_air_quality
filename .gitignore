@@ -122,3 +122,6 @@ logs/
 
 # Structure tree -L 2 > structure.txt
 structure.txt
+
+# notebooks
+/notebooks/*
