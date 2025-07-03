@@ -156,7 +156,9 @@ It will:
 
 Console logs include:  
 - Step start/end  
-- Row/column count  
+- Row/column count
+- DataFrame Info
+- Count null values  
 - Time taken  
 - Any exceptions with full tracebacks
 
