@@ -41,7 +41,7 @@ from typing import Optional, Dict
 import pandas as pd
 from utils.air_quality_rules import quality_thresholds, quality_labels
 from utils.province_mapper import ProvinceMapper
-from processors.BaseProcessor import BaseProcessor
+from processors.base_processor import BaseProcessor
 
 class AirQualityProcessor(BaseProcessor):
     """

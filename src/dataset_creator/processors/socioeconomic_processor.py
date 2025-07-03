@@ -22,7 +22,7 @@ USAGE: processor = SocioeconomicProcessor(); processor.process()
 """
 
 
-from processors.BaseProcessor import BaseProcessor
+from processors.base_processor import BaseProcessor
 from typing import Optional
 from pathlib import Path
 
