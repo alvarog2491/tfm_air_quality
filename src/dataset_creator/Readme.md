@@ -1,4 +1,4 @@
-# 🌍 Spanish Multi-Source Data Pipeline
+# Multi-Source Data Pipeline
 
 A complete data processing pipeline that integrates **air quality**, **health**, and **socioeconomic** data from official sources in CSV format across Spanish provinces. The pipeline processes and combines this data into a unified, clean dataset ready for analysis or machine learning tasks.
 
