@@ -58,34 +58,40 @@ def run_data_processing():
     try:
         # Step 1: Process air quality data
         logging.info("============ Starting air quality data processing ============")
-        from processors.AirQualityProcessor import AirQualityProcessor
+        from processors.air_quality_processor import AirQualityProcessor
         aq_processor = AirQualityProcessor()
         aq_processor.process()
         logging.info(f"Air quality data processed succesfully")
         
         # Step 2: Process health data
         logging.info("============ Starting health data processing ============")
-        from processors.HealthProcessor import HealthProcessor
+        from processors.health_processor import HealthProcessor
         health_processor = HealthProcessor()
         health_processor.process()
         logging.info(f"Health data processed succesfully")
         
         # Step 3: Process socioeconomic data
         logging.info("============ Starting socioeconomic data processing ============")
-        from processors.SocioeconomicProcessor import SocioeconomicProcessor
+        from processors.socioeconomic_processor import SocioeconomicProcessor
         socio_processor = SocioeconomicProcessor()
         socio_processor.process()
         logging.info(f"Socioeconomic data processed succesfully")
         
         # Step 4: Merge all datasets
         logging.info("============ Starting dataset merging ============")
-        from processors.DataMerger import DataMerger
+        from processors.data_merger import DataMerger
         merger = DataMerger()
-        final_df = merger.merge_all_data(aq_processor.air_quality_df,
+        merged_df = merger.merge_all_data(aq_processor.air_quality_df,
                                          health_processor.health_df,
                                          socio_processor.socioeconomic_df)
-        logging.info(f"Final dataset merged succesfully: {len(final_df)} records, {len(final_df.columns)} columns")
+        logging.info(f"Dataset merged succesfully: {len(merged_df)} records, {len(merged_df.columns)} columns")
         
+        # Step 5: Data Cleaner
+        logging.info("============ Starting dataset cleaner ============")
+        from processors.dataset_cleaner import DatasetCleaner
+        cleaner = DatasetCleaner()
+        final_df = cleaner.clean_dataset(merged_df)
+
         # Save final result
         logging.info("============ Save final dataframe ============")
         data_dir = Path(__file__).resolve().parent / "data" 
@@ -142,6 +148,7 @@ def main():
     except Exception as e:
         logging.error(f"Fatal error: {str(e)}")
         print(f"❌ Error: {str(e)}")
+        raise
         sys.exit(1)
 
 if __name__ == "__main__":
