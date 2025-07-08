@@ -2,7 +2,8 @@ import pytest
 import pandas as pd
 from unittest.mock import patch, MagicMock
 from pathlib import Path
-from processors.AirQualityProcessor import AirQualityProcessor
+from processors.air_quality_processor import AirQualityProcessor
+from utils.air_quality_rules import quality_labels
 
 @pytest.fixture
 def sample_df():
@@ -12,7 +13,7 @@ def sample_df():
         'Air Pollutant': ['no2', 'pm10'],
         'Air Pollutant Description': ['Nitrogen dioxide (air)', 'Particulate matter'],
         'Data Aggregation Process': ['Annual mean / 1 calendar year', 'Annual mean / 1 calendar year'],
-        'Year': pd.to_datetime(['1991-01-01', '1991-01-01']),
+        'Year': pd.to_datetime([2000, 2001]),
         'Air Pollution Level': [80.6, 50.0],
         'Unit Of Air Pollution Level': ['ug/m3', 'ug/m3'],
         'Air Quality Station Type': ['Background', 'Background'],
@@ -22,7 +23,6 @@ def sample_df():
         'Latitude': [0.0, 0.0],
         'Province': ['Madrid', 'Madrid'],
     })
-import pytest
 
 @pytest.fixture
 def air_quality_raw_csv_data():
@@ -40,18 +40,18 @@ def processor(tmp_path):
 
     return AirQualityProcessor(data_folder=tmp_path)
 
-def test_load_csv_files_success(processor, tmp_path, air_quality_csv_data):
+def test_load_csv_files_success(processor, tmp_path, air_quality_raw_csv_data):
     raw_dir = tmp_path / "raw"
     raw_dir.mkdir()
     csv_path = raw_dir / "air_quality_with_province.csv"
-    csv_path.write_text(air_quality_csv_data)
+    csv_path.write_text(air_quality_raw_csv_data)
     
     processor.load_csv_files()
     
     assert processor.is_loaded
     df = processor.air_quality_df
     assert set(df.columns) == set(processor._COLUMN_DTYPES.keys())
-    assert pd.api.types.is_categorical_dtype(df['Air Pollutant'])
+    assert isinstance(processor.air_quality_df['Air Pollutant'].dtype, pd.CategoricalDtype)
 
 
 def test_load_csv_files_file_not_found(processor):
@@ -68,16 +68,16 @@ def test_classify_quality_assigns_labels(processor, sample_df):
 
     # Patch quality_thresholds and quality_labels for test
     with patch("utils.air_quality_rules.quality_thresholds", {'no2': [0, 40, 80, 120]}), \
-         patch("utils.air_quality_rules.quality_labels", ['LOW', 'MEDIUM', 'HIGH']):
+         patch("utils.air_quality_rules.quality_labels", quality_labels):
 
         processor.classify_quality()
 
         # Check 'Quality' column added
         assert 'Quality' in processor.air_quality_df.columns
         # Check type is categorical
-        assert pd.api.types.is_categorical_dtype(processor.air_quality_df['Quality'])
+        assert isinstance(processor.air_quality_df['Quality'].dtype, pd.CategoricalDtype)
         # Check known classification label
-        assert processor.air_quality_df.loc[0, 'Quality'] in ['LOW', 'MEDIUM', 'HIGH']
+        assert processor.air_quality_df.loc[0, 'Quality'] in quality_labels
 
 def test_classify_quality_without_data_raises(processor):
     """Test classify_quality raises ValueError if data not loaded."""
@@ -121,7 +121,7 @@ def test_save_processed_file_raises_if_no_data(processor):
     with pytest.raises(ValueError):
         processor.save_processed_file()
 
-def test_process_runs_full_pipeline(processor, sample_df, tmp_path):
+def test_process_runs_full_pipeline(processor, air_quality_raw_csv_data, tmp_path):
     """
     Test full process() method runs all steps without error.
     Mocks load_csv_files, classify_quality, map_province_names and save_processed_file.
@@ -131,7 +131,11 @@ def test_process_runs_full_pipeline(processor, sample_df, tmp_path):
     raw_dir = tmp_path / "raw"
     raw_dir.mkdir()
     csv_path = raw_dir / "air_quality_with_province.csv"
-    sample_df.to_csv(csv_path, index=False)
+    csv_path.write_text(air_quality_raw_csv_data)
+    
+    processor.load_csv_files()
+    
+    assert processor.is_loaded
 
     # Patch classify_quality, map_province_names and save_processed_file to mocks to track calls
     with patch.object(processor, 'classify_quality') as mock_classify, \
