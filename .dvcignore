@@ -4,4 +4,3 @@
 
 src/dataset_creator/data/output/*
 !src/dataset_creator/data/output/dataset.csv
-!src/dataset_creator/data/output/dataset.csv.dvc
