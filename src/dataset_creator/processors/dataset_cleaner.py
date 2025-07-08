@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 import pandas as pd
-
+import numpy as np
 
 class DatasetCleaner:
     """
@@ -60,7 +60,6 @@ class DatasetCleaner:
 
         self._remove_null_provinces()
         self._remove_island_observations()
-        self._remove_undefined_provinces()
         self._filter_timeframe()
 
         self.logger.info("Dataset cleaning process completed")
@@ -70,8 +69,8 @@ class DatasetCleaner:
         """
         Removes rows with null values in the 'province' column if they represent less than 5% of the dataset.
         """
+        self._convert_invalid_province_to_nan()
         null_province_percentage = self._dataset['Province'].isnull().mean() * 100
-        print(null_province_percentage)
         if null_province_percentage == 0:
             self.logger.info("Not found any null value on Province")
         elif null_province_percentage < 5:
@@ -79,6 +78,13 @@ class DatasetCleaner:
             self._dataset = self._dataset.dropna(subset=['Province'])
         else:
             self.logger.warning(f"Null provinces exceed 5% ({null_province_percentage:.2f}%), not removing them.")
+
+    def _convert_invalid_province_to_nan(self):
+        """
+        Replace invalid values in the 'Province' column (e.g., 'nan', 'Desconocido', 'Error') with NaN.
+        """
+        self._dataset.loc[self._dataset['Province'].isin(['nan', 'Desconocido', 'Error']), 'Province'] = np.nan
+
 
     def _remove_island_observations(self):
         """
@@ -90,29 +96,20 @@ class DatasetCleaner:
         removed_count = initial_count - len(self._dataset)
         self.logger.info(f"Removed {removed_count} island observations")
 
-    def _remove_undefined_provinces(self):
-        """
-        Removes all observations with undefined or erroneous provinces.
-        """
-        undefined_provinces = ['Desconocido', 'Error']
-        initial_count = len(self._dataset)
-        self._dataset = self._dataset[~self._dataset['Province'].isin(undefined_provinces)]
-        removed_count = initial_count - len(self._dataset)
-        self.logger.info(f"Removed {removed_count} undefined province observations")
 
     def _filter_timeframe(self):
         """
-        Keeps only observations from the years 2000 to 2022 (inclusive).
+        Keeps only observations from the years 2000 to 2021 (inclusive).
         """
         initial_count = len(self._dataset)
 
         # Ensure comparison works for both datetime and integer types
         if pd.api.types.is_datetime64_any_dtype(self._dataset['Year']):
-            mask = self._dataset['Year'].dt.year.between(2000, 2022)
+            mask = self._dataset['Year'].dt.year.between(2000, 2021)
         else:
-            mask = self._dataset['Year'].between(2000, 2022)
+            mask = self._dataset['Year'].between(2000, 2021)
 
         self._dataset = self._dataset[mask]
         removed_count = initial_count - len(self._dataset)
-        self.logger.info(f"Removed {removed_count} observations outside the 2000-2022 timeframe")
+        self.logger.info(f"Removed {removed_count} observations outside the 2000-2021 timeframe")
 
