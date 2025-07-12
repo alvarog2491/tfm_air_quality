@@ -1,0 +1,27 @@
+preprocess:
+  drop_colnames:
+    - Air Pollutant
+    - Air Pollutant Description
+    - Data Aggregation Process
+    - Year
+    - Unit Of Air Pollution Level
+    - Province
+  target_column: Respiratory_diseases_total
+  categorical_features:
+    - Air Quality Station Type
+    - Air Quality Station Area
+    - Quality
+  numerical_features:
+    - Air Pollution Level
+    - Life_expectancy_total
+    - pib
+  validation_size: 0.2
+
+train:
+  model_type: linear_regression
+  target_column: Respiratory_diseases_total
+  train_test_split:
+    test_size: 0.2
+    random_state: 1991
+  shuffle: false
+  shuffle_random_state: 1991

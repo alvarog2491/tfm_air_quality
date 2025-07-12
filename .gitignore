@@ -128,3 +128,5 @@ structure.txt
 
 # dataset
 src/dataset_creator/data/output/dataset_*
+
+dvc_annotations.txt
