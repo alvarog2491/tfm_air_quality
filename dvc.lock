@@ -1,0 +1,45 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python3 src/modeling/preprocess_dataset.py params.yaml 
+      src/dataset_creator/data/output/dataset.csv 
+      data/processed_training_data.csv
+    deps:
+    - path: src/dataset_creator/data/output/dataset.csv
+      hash: md5
+      md5: 43c920c0ec403b07456c7fd1b7b381e0
+      size: 4124796
+    - path: src/modeling/preprocess_dataset.py
+      hash: md5
+      md5: ee79d0da9870c6ca720984e394c1e531
+      size: 4197
+    outs:
+    - path: data/processed_evaluation_data.csv
+      hash: md5
+      md5: 2712b8663f7852f812cf60d77650305b
+      size: 368527
+    - path: data/processed_training_data.csv
+      hash: md5
+      md5: 8be3d0488190621e7dba0a969c161d97
+      size: 3094960
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 4e9357f9b146989c039410f768ae9127
+      size: 975
+  train:
+    cmd: python3 src/modeling/train.py params.yaml 
+      data/processed_training_data.csv models/model.pkl
+    deps:
+    - path: data/processed_training_data.csv
+      hash: md5
+      md5: 8be3d0488190621e7dba0a969c161d97
+      size: 3094960
+    - path: src/modeling/train.py
+      hash: md5
+      md5: 601ed9a652909b053fe5bb29ace4b1f4
+      size: 2383
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: c073eb895006e689ee24016a680b2761
+      size: 1700

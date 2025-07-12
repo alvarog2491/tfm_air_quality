@@ -1,0 +1,29 @@
+stages:
+  preprocess:
+    cmd: python3 src/modeling/preprocess_dataset.py params.yaml src/dataset_creator/data/output/dataset.csv data/processed_training_data.csv
+    deps:
+      - src/modeling/preprocess_dataset.py
+      - src/dataset_creator/data/output/dataset.csv
+    outs:
+      - data/processed_training_data.csv
+      - data/processed_evaluation_data.csv
+      - models/scaler.pkl
+
+  train:
+    cmd: python3 src/modeling/train.py params.yaml data/processed_training_data.csv models/model.pkl
+    deps:
+      - src/modeling/train.py
+      - data/processed_training_data.csv
+    outs:
+      - models/model.pkl
+  
+  evaluate:
+    cmd: python3 src/modeling/evaluate.py params.yaml models/model.pkl data/processed_data_eval.csv metrics/evaluation.json
+    deps:
+      - src/modeling/evaluate.py
+      - models/model.pkl
+      - data/processed_data_eval.csv
+    outs:
+      - metrics/evaluation.json
+    params:
+      - params.yaml:evaluate

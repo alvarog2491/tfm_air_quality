@@ -6,7 +6,6 @@ from sklearn.preprocessing import StandardScaler
 class LinearRegressionModel(BaseModel):
     def __init__(self):
         self.pipeline = Pipeline([
-            ('scaler', StandardScaler()),
             ('regressor', LinearRegression())
         ])
 
