@@ -1,27 +1,62 @@
+# Common definitions with anchors (&)
+common_drop_colnames: &common_drop_colnames
+  - Air Pollutant
+  - Air Pollutant Description
+  - Data Aggregation Process
+  - Year
+  - Unit Of Air Pollution Level
+  - Province
+
+common_categorical_features: &common_categorical_features
+  - Air Quality Station Type
+  - Air Quality Station Area
+  - Quality
+
+common_numerical_features: &common_numerical_features
+  - Air Pollution Level
+  - Life_expectancy_total
+  - pib
+
+common_target: &common_target "Respiratory_diseases_total"
+common_shuffle: &common_shuffle false
+common_shuffle_random_state: &common_shuffle_random_state 1991
+
+common_dtypes: &common_dtypes
+  Air Pollutant: "category"
+  Air Pollutant Description: "category"
+  Data Aggregation Process: "category"
+  Air Pollution Level: "float"
+  Unit Of Air Pollution Level: "category"
+  Air Quality Station Type: "category"
+  Air Quality Station Area: "category"
+  Altitude: "float"
+  Province: "category"
+  Quality: "category"
+  Respiratory_diseases_total: "float"
+  Life_expectancy_total: "float"
+  pib: "float"
+
+# Sections using aliases (*)
 preprocess:
-  drop_colnames:
-    - Air Pollutant
-    - Air Pollutant Description
-    - Data Aggregation Process
-    - Year
-    - Unit Of Air Pollution Level
-    - Province
-  target_column: Respiratory_diseases_total
-  categorical_features:
-    - Air Quality Station Type
-    - Air Quality Station Area
-    - Quality
-  numerical_features:
-    - Air Pollution Level
-    - Life_expectancy_total
-    - pib
+  drop_colnames: *common_drop_colnames
+  target_column: *common_target
+  categorical_features: *common_categorical_features
+  numerical_features: *common_numerical_features
+  var_dtypes: *common_dtypes
   validation_size: 0.2
 
 train:
   model_type: linear_regression
-  target_column: Respiratory_diseases_total
+  target_column: *common_target
   train_test_split:
     test_size: 0.2
     random_state: 1991
-  shuffle: false
-  shuffle_random_state: 1991
+  shuffle: *common_shuffle
+  shuffle_random_state: *common_shuffle_random_state
+
+evaluate:
+  target_column: *common_target
+  drop_colnames: *common_drop_colnames
+  var_dtypes: *common_dtypes
+  shuffle: *common_shuffle
+  shuffle_random_state: *common_shuffle_random_state

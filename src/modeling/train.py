@@ -2,14 +2,15 @@ import json
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from utils import load_config, load_data
+from utils import load_yaml_config
+from data_utils import prepare_features_and_target
 import joblib
 import argparse
 
 
 def main(config_file: str, processed_dataset: str, output_model: str):
     # Load configuration
-    config = load_config(config_file)["train"]
+    config = load_yaml_config(config_file)["train"]
     model_type = config["model_type"]
     target_column = config["target_column"]
     shuffle = config["shuffle"]
@@ -19,7 +20,7 @@ def main(config_file: str, processed_dataset: str, output_model: str):
     
     # Load and split the dataset
     print("Loading and splitting the dataset...")
-    X, y = load_data(processed_dataset, target_column, shuffle, shuffle_random_state)
+    X, y = prepare_features_and_target(processed_dataset, target_column, shuffle, shuffle_random_state)
 
     # Split the dataset
     X_train, X_test, y_train, y_test = train_test_split(

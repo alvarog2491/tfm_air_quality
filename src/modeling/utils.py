@@ -2,37 +2,41 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
-import pandas as pd
 import yaml
 
 
-def load_config(path: str) -> Dict[str, Union[str, List[str], Dict[str, Any]]]:
-    """Load a yaml file from a given path and return a dictionary."""
+def load_yaml_config(path: str) -> Dict[str, Union[str, List[str], Dict[str, Any]]]:
+    """
+    Load a YAML configuration file from the specified path.
+
+    Parameters:
+    path (str): Path to the YAML configuration file.
+
+    Returns:
+    Dict[str, Union[str, List[str], Dict[str, Any]]]: Parsed configuration as a dictionary.
+    """
     with open(path, "r") as fp:
         return yaml.safe_load(fp)
 
+def reset_directory(path: str) -> None:
+    """
+    Delete the directory at the given path if it exists, then recreate it.
 
-def delete_and_recreate_dir(path: str) -> None:
-    """Delete and recreate a directory."""
+    Parameters:
+    path (str): Path to the directory to reset.
+    """
     try:
         shutil.rmtree(path)
-    except:
+    except Exception:
         pass
     finally:
         Path(path).mkdir(parents=True, exist_ok=True)
 
+def create_directory(path: str) -> None:
+    """
+    Create a directory at the specified path if it does not already exist.
 
-def load_data(
-    file_path: str, target_column: str, shuffle: bool, shuffle_random_state: int
-) -> Tuple[pd.DataFrame, pd.Series]:
-    """Load a dataset from a given file path and return X and y."""
-    data = pd.read_csv(file_path)
-
-    if shuffle:
-        data = data.sample(frac=1, random_state=shuffle_random_state).reset_index(
-            drop=True
-        )
-
-    X = data.drop(target_column, axis=1)
-    y = data[target_column]
-    return X, y
+    Parameters:
+    path (str): Path to the directory to create.
+    """
+    Path(path).mkdir(parents=True, exist_ok=True)
