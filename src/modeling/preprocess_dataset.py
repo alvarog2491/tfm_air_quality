@@ -24,6 +24,20 @@ def read_dataset(
     df = pd.read_csv(filename).drop(columns=drop_columns)
     return df
 
+def check_missing_values(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Checks for missing values in the dataframe and stops execution if any are found
+
+    Parameters:
+    df (pd.Dataframe): Pandas dataframe containing features and targets
+
+    Returns:
+    pd.Dataframe: Dataframe 
+    """
+    if df.isnull().values.any():
+        raise ValueError("Data contains missing values. Please handle them before proceeding.")
+
+    return df
 
 def one_hot_encode_categorical_features(
     df: pd.DataFrame, categorical_columns: List[str]) -> pd.DataFrame:
@@ -87,6 +101,11 @@ def main(config_file: str, raw_dataset: str, output_dataset: str):
     training_dataset, evaluation_dataset = separate_train_evaluate_dataset(
         df=dataset, size=validation_size)
 
+    # Check for missing values
+    print("Checking for missing values...")
+    training_dataset = check_missing_values(training_dataset)
+    evaluation_dataset = check_missing_values(evaluation_dataset)
+    
     # One-hot encode categorical columns
     print("One-hot encoding categorical columns...")
     training_dataset = one_hot_encode_categorical_features(
