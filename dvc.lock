@@ -1,31 +1,27 @@
 schema: '2.0'
 stages:
   preprocess:
-    cmd: python3 src/modeling/preprocess_dataset.py params.yaml 
+    cmd: python3 src/modeling/preprocess.py params.yaml 
       src/dataset_creator/data/output/dataset.csv 
-      data/processed_training_data.csv
+      data/processed_training_data.csv data/processed_test_data.csv
     deps:
     - path: src/dataset_creator/data/output/dataset.csv
       hash: md5
       md5: 43c920c0ec403b07456c7fd1b7b381e0
       size: 4124796
-    - path: src/modeling/preprocess_dataset.py
+    - path: src/modeling/preprocess.py
       hash: md5
-      md5: ee79d0da9870c6ca720984e394c1e531
-      size: 4197
+      md5: 1313102be34088dce37a718e08cb1cf3
+      size: 3368
     outs:
-    - path: data/processed_evaluation_data.csv
+    - path: data/processed_test_data.csv
       hash: md5
-      md5: 2712b8663f7852f812cf60d77650305b
-      size: 368527
+      md5: c808e2e9ad433edc03a6bf3163ca5685
+      size: 773003
     - path: data/processed_training_data.csv
       hash: md5
       md5: 8be3d0488190621e7dba0a969c161d97
       size: 3094960
-    - path: models/scaler.pkl
-      hash: md5
-      md5: 4e9357f9b146989c039410f768ae9127
-      size: 975
   train:
     cmd: python3 src/modeling/train.py params.yaml 
       data/processed_training_data.csv models/model.pkl
@@ -36,10 +32,31 @@ stages:
       size: 3094960
     - path: src/modeling/train.py
       hash: md5
-      md5: 601ed9a652909b053fe5bb29ace4b1f4
-      size: 2383
+      md5: eb5f824aac71c474c1331901f87e2d43
+      size: 2451
     outs:
     - path: models/model.pkl
       hash: md5
       md5: c073eb895006e689ee24016a680b2761
       size: 1700
+  evaluate:
+    cmd: python3 src/modeling/evaluate.py params.yaml models/model.pkl 
+      data/processed_test_data.csv metrics/evaluation.json
+    deps:
+    - path: data/processed_test_data.csv
+      hash: md5
+      md5: c808e2e9ad433edc03a6bf3163ca5685
+      size: 773003
+    - path: models/model.pkl
+      hash: md5
+      md5: c073eb895006e689ee24016a680b2761
+      size: 1700
+    - path: src/modeling/evaluate.py
+      hash: md5
+      md5: 96c9e0eee348121d413e113ab2e6208d
+      size: 2823
+    outs:
+    - path: metrics/evaluation.json
+      hash: md5
+      md5: 80af446f8bcbd6a2e876033b99f848a1
+      size: 59

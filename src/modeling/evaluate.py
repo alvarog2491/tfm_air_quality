@@ -1,69 +1,98 @@
 import json
-
+from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
-from metrics_and_plots import save_confusion_matrix, save_metrics, save_predictions
-from model import evaluate_model, train_model
-from utils_and_constants import load_config, load_data
+from data_utils import prepare_features_and_target, one_hot_encode_categorical_features, scale_numerical_features
+from utils import load_yaml_config, create_directory
 
 import argparse
 
+def evaluate_model(model, X_test, y_test):
+    """
+    Evaluate the model on the test set and return metrics.
+    """
+    metrics = model.evaluate(X_test, y_test)
+    return metrics
 
-def main(config_file: str, processed_dataset: str):
-    config = load_config(config_file)
+def load_pickle_file(file_path):
+    """
+    Load a pickle file from the specified path.
+    """
+    import joblib
+    return joblib.load(file_path)
 
-    # Load and split the dataset
+def save_metrics(metrics, output_file):
+    """
+    Save the evaluation metrics to a JSON file.
+    """
+    create_directory(Path(output_file).parent)
+    with open(output_file, 'w') as f:
+        json.dump(metrics, f, indent=2)
+
+
+def main(
+    config_file: str,
+    model_file: str,
+    evaluation_dataset: str,
+    output_metrics: str,
+):
+    # Load configuration
+    print("Loading configuration...")
+    config = load_yaml_config(config_file)["evaluate"]
+    target_column = config["target_column"]
+    shuffle = config["shuffle"]
+    shuffle_random_state = config["shuffle_random_state"]
+    var_dtypes = config["var_dtypes"]
+
+    # Loading dataset
     print("Loading and splitting the dataset...")
+    X, y = prepare_features_and_target(evaluation_dataset, target_column, shuffle, shuffle_random_state, var_dtypes=var_dtypes)
+    print(f"Dataset X shape: {X.shape}")
+    print(f"Dataset y shape: {y.shape}")
 
-    target_column = config["train_and_evaluate"]["target_column"]
-    shuffle = config["train_and_evaluate"]["shuffle"]
-    shuffle_random_state = config["train_and_evaluate"]["shuffle_random_state"]
-    X, y = load_data(processed_dataset, target_column, shuffle, shuffle_random_state)
+    # Load the trained model
+    print("Loading the trained model...")
+    model = load_pickle_file(model_file) 
 
-    # Split the dataset
-    random_state = config["train_and_evaluate"]["train_test_split"]["random_state"]
-    test_size = config["train_and_evaluate"]["train_test_split"]["test_size"]
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state
-    )
-    print(f"Dataset shape: {X.shape}")
-    print(f"Train set shape: {X_train.shape}")
-    print(f"Test set shape: {X_test.shape}")
-
-    # Train and evaluate the model
-    print("Training and evaluating the model...")
-    rfc_params = config["train_and_evaluate"]["rfc_params"]
-    model = train_model(X_train, y_train, **rfc_params)
-    metrics = evaluate_model(model, X_test, y_test)
+    # Evaluate the model
+    print("Evaluating the model...")
+    metrics = evaluate_model(model, X, y)
 
     print("====================Test Set Metrics==================")
     print(json.dumps(metrics, indent=2))
     print("======================================================")
-
-    save_metrics(metrics)
-    save_confusion_matrix(model, X_test, y_test)
-    save_predictions(y_test, model.predict(X_test))
-
+    save_metrics(metrics, output_metrics)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Train and evaluate the weather prediction model"
+    description="Evaluate Air Quality prediction model"
     )
     parser.add_argument(
         "config_file",
         type=str,
         help="Configuration file with parameters",
-        default="config.yaml",
     )
     parser.add_argument(
-        "input_dataset",
+        "model_file",
         type=str,
-        help="Processed Input CSV file path",
-        default="processed_dataset/weather.csv",
+        help="Trained model file path",
     )
+    parser.add_argument(
+        "evaluation_dataset",
+        type=str,
+        help="Processed evaluation CSV file path",
+    )
+    parser.add_argument(
+        "output_metrics",
+        type=str,
+        help="Output JSON file for evaluation metrics",
+    )
+
     args = parser.parse_args()
+
     main(
         config_file=args.config_file,
-        processed_dataset=args.input_dataset,
+        model_file=args.model_file,
+        evaluation_dataset=args.evaluation_dataset,
+        output_metrics=args.output_metrics,
     )
