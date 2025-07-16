@@ -46,38 +46,26 @@ class DatasetCleaner:
         """
         return self._dataset is not None
 
-    def clean_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
+    def _handle_null_values(self):
         """
-        Main method to clean the dataset by applying all cleaning steps.
-
-        :param dataset: The dataset to clean.
-        :type dataset: pd.DataFrame
-        :return: The cleaned dataset.
-        :rtype: pd.DataFrame
-        """
-        self.logger.info("Starting dataset cleaning process")
-        self._dataset = dataset.copy()
-
-        self._remove_null_provinces()
-        self._remove_island_observations()
-        self._filter_timeframe()
-
-        self.logger.info("Dataset cleaning process completed")
-        return self._dataset
-
-    def _remove_null_provinces(self):
-        """
-        Removes rows with null values in the 'province' column if they represent less than 5% of the dataset.
+        For each column in the dataset:
+        - If null percentage == 0% → log info.
+        - If null percentage < 5% → remove rows with nulls in that column.
+        - If null percentage >= 5% → log warning and keep them.
         """
         self._convert_invalid_province_to_nan()
-        null_province_percentage = self._dataset['Province'].isnull().mean() * 100
-        if null_province_percentage == 0:
-            self.logger.info("Not found any null value on Province")
-        elif null_province_percentage < 5:
-            self.logger.info(f"Removing null provinces (found {null_province_percentage:.2f}% of dataset)")
-            self._dataset = self._dataset.dropna(subset=['Province'])
-        else:
-            self.logger.warning(f"Null provinces exceed 5% ({null_province_percentage:.2f}%), not removing them.")
+
+        for column in self._dataset.columns:
+            null_percentage = self._dataset[column].isnull().mean() * 100
+
+            if null_percentage == 0:
+                self.logger.info(f"No null values found in '{column}'")
+            elif null_percentage < 0.05:
+                self.logger.info(f"Removing rows with nulls in '{column}' ({null_percentage:.2f}% of dataset)")
+                self._dataset = self._dataset.dropna(subset=[column])
+            else:
+                self.logger.warning(f"Nulls in '{column}' exceed 5% ({null_percentage:.2f}%), keeping them.")
+
 
     def _convert_invalid_province_to_nan(self):
         """
@@ -113,3 +101,21 @@ class DatasetCleaner:
         removed_count = initial_count - len(self._dataset)
         self.logger.info(f"Removed {removed_count} observations outside the 2000-2021 timeframe")
 
+    def clean_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
+        """
+        Main method to clean the dataset by applying all cleaning steps.
+
+        :param dataset: The dataset to clean.
+        :type dataset: pd.DataFrame
+        :return: The cleaned dataset.
+        :rtype: pd.DataFrame
+        """
+        self.logger.info("Starting dataset cleaning process")
+        self._dataset = dataset.copy()
+
+        self._remove_island_observations()
+        self._filter_timeframe()
+        self._handle_null_values()
+        
+        self.logger.info("Dataset cleaning process completed")
+        return self._dataset
