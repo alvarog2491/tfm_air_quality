@@ -95,10 +95,6 @@ def run_data_processing():
         # Save final result
         logging.info("============ Save final dataframe ============")
         data_dir = Path(__file__).resolve().parent / "data" 
-        output_path = f"{data_dir}/output/dataset_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-        final_df.to_csv(output_path, index=False)
-        
-        # Also save a version without timestamp for general use
         output_path = f"{data_dir}/output/dataset.csv"
         final_df.to_csv(output_path, index=False)
         logging.info("Final dataset saved")
