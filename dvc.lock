@@ -2,10 +2,10 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: python3 src/modeling/preprocess.py params.yaml 
-      src/dataset_creator/data/output/dataset.csv 
-      data/processed_training_data.csv data/processed_test_data.csv
+      src/featuring/data/output/dataset.csv data/processed_training_data.csv 
+      data/processed_test_data.csv
     deps:
-    - path: src/dataset_creator/data/output/dataset.csv
+    - path: src/featuring/data/output/dataset.csv
       hash: md5
       md5: 43c920c0ec403b07456c7fd1b7b381e0
       size: 4124796

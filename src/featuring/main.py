@@ -95,10 +95,6 @@ def run_data_processing():
         # Save final result
         logging.info("============ Save final dataframe ============")
         data_dir = Path(__file__).resolve().parent / "data" 
-        output_path = f"{data_dir}/output/dataset_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-        final_df.to_csv(output_path, index=False)
-        
-        # Also save a version without timestamp for general use
         output_path = f"{data_dir}/output/dataset.csv"
         final_df.to_csv(output_path, index=False)
         logging.info("Final dataset saved")
@@ -116,7 +112,7 @@ def main():
     Raises:
         SystemExit: If processing fails.
     """
-    print("🚀 Starting automated data processing...")
+    print("Starting automated data processing...")
     print("=" * 60)
     
     start_time = datetime.now()
@@ -134,15 +130,15 @@ def main():
         
         print("\n" + "=" * 60)
         print("✅ Processing completed successfully!")
-        print(f"📊 Final dataset: {len(final_df)} rows, {len(final_df.columns)} columns")
-        print(f"⏱️  Total time: {processing_time}")
-        print(f"📁 File saved as: output/dataset.csv")
+        print(f"Final dataset: {len(final_df)} rows, {len(final_df.columns)} columns")
+        print(f"Total time: {processing_time}")
+        print(f"File saved as: output/dataset.csv")
         print("=" * 60)
         
         # Show dataset preview
-        print("\n📋 Final dataset preview:")
+        print("\nFinal dataset preview:")
         print(final_df.head())
-        print(f"\n📈 Dataset info:")
+        print(f"\nDataset info:")
         print(final_df.info())
         
     except Exception as e:

@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime
 from processors.dataset_cleaner import DatasetCleaner
 
-
 @pytest.fixture
 def raw_dataset():
     return pd.DataFrame({
@@ -24,6 +23,17 @@ def raw_dataset():
         'Value': list(range(25))
     })
 
+@pytest.fixture
+def dataset_with_many_nulls():
+    """
+    Provides a dataset where 'Value' column has 20% nulls.
+    Used to test that rows are not dropped when nulls exceed the threshold.
+    """
+    return pd.DataFrame({
+        'Province': ['Madrid'] * 20,
+        'Year': [datetime(2020, 1, 1)] * 20,
+        'Value': list(range(16)) + [None] * 4  # 4 nulls de 20 → 20%
+    })
 
 def test_dataset_loading(raw_dataset):
     """
@@ -46,6 +56,22 @@ def test_remove_null_provinces(raw_dataset):
 
     assert cleaner.dataset['Province'].isnull().sum() == 0
 
+def test_not_remove_rows_when_nulls_exceed_threshold(dataset_with_many_nulls):
+    """
+    Tests that rows are not removed when a column has >= 5% null values.
+    """
+    cleaner = DatasetCleaner()
+
+    original_length = len(dataset_with_many_nulls)
+
+    cleaner.clean_dataset(dataset_with_many_nulls)
+    cleaned_df = cleaner.dataset
+
+    assert len(cleaned_df) == original_length, \
+        f"Expected {original_length} rows, but got {len(cleaned_df)}"
+
+    assert cleaned_df['Value'].isnull().sum() == 4, \
+        f"Expected 4 nulls in 'Value', but got {cleaned_df['Value'].isnull().sum()}"
 
 def test_remove_island_observations(raw_dataset):
     """

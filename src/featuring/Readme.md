@@ -1,34 +1,46 @@
 # Multi-Source Data Pipeline
 
-A complete data processing pipeline that integrates **air quality**, **health**, and **socioeconomic** data from official sources in CSV format across Spanish provinces. The pipeline processes and combines this data into a unified, clean dataset ready for analysis or machine learning tasks.
+A data processing pipeline that integrates **air quality**, **health**, and **socioeconomic** datasets from official sources across Spanish provinces. It cleans and merges the data into a unified dataset with the engineered features needed for analysis or machine learning.
 
 ---
 
-## 📚 Table of Contents
+## Table of Contents
 
-- 📄 [Description](#-description)
-- 📊 [Data Sources](#-data-sources)
-- ⚙️ [Data Processing Pipeline](#-data-processing-pipeline)
-- 🚀 [Usage](#-usage)
-- 🧠 [Main Orchestrator](#-main-orchestrator)
-- 🧼 [Province Name Standardization](#-province-name-standardization)
-- 📁 [Output](#-output)
+- [Multi-Source Data Pipeline](#multi-source-data-pipeline)
+  - [Table of Contents](#table-of-contents)
+  - [Description](#description)
+  - [Data Sources](#data-sources)
+    - [Air Quality](#air-quality)
+    - [Health](#health)
+    - [Socioeconomic](#socioeconomic)
+  - [Data Processing Pipeline](#data-processing-pipeline)
+    - [Air Quality](#air-quality-1)
+    - [Health](#health-1)
+    - [Socioeconomic](#socioeconomic-1)
+    - [Merge](#merge)
+    - [Cleansd](#cleansd)
+  - [Usage](#usage)
+    - [Run Everything](#run-everything)
+    - [Run Individual Steps](#run-individual-steps)
+  - [Main Orchestrator](#main-orchestrator)
+  - [Province Name Standardization](#province-name-standardization)
+  - [Output](#output)
 
 ---
 
-## 📄 Description
+## Description
 
 This pipeline builds a unified dataset combining three key data types:
 
-- 🏭 **Air Quality**: Pollutant levels recorded by sensors across Spain.  
-- 🏥 **Health**: Life expectancy and deaths related to respiratory diseases by province.  
-- 💰 **Socioeconomic**: GDP per capita by province, from 2000 to 2022.  
+- **Air Quality**: Pollutant levels recorded by sensors across Spain.  
+- **Health**: Life expectancy and deaths related to respiratory diseases by province.  
+- **Socioeconomic**: GDP per capita by province, from 2000 to 2022.  
 
 All records are standardized to share the same structure, using `Province` and `Year` as primary keys.
 
 ---
 
-## 📊 Data Sources
+## Data Sources
 
 All CSV files have been downloaded from the official links listed below. The raw data for each category can be found in the corresponding folder under data/*type*/raw/.
 For example, air pollution data is located at:
@@ -53,11 +65,11 @@ data/air_quality_data/raw/
 
 ---
 
-## ⚙️ Data Processing Pipeline
+## Data Processing Pipeline
 
 The pipeline runs in four phases:
 
-### 1️⃣ Air Quality
+### Air Quality
 
 Reads pollutant data and adds a classification column based on thresholds, collected from BOE.
 
@@ -76,7 +88,7 @@ Reads pollutant data and adds a classification column based on thresholds, colle
 
 ---
 
-### 2️⃣ Health
+### Health
 
 Combines mortality and life expectancy data into a unified format.
 
@@ -92,7 +104,7 @@ Combines mortality and life expectancy data into a unified format.
 
 ---
 
-### 3️⃣ Socioeconomic
+### Socioeconomic
 
 Converts wide-format GDP data into long format.
 
@@ -105,13 +117,17 @@ Converts wide-format GDP data into long format.
 
 ---
 
-### 4️⃣ Merge
+### Merge
 
 Merges the outputs of the previous processors into a single, unified dataset.
 
 ---
 
-## 🚀 Usage
+### Cleansd
+
+Clean the merged dataset by removing unnecessary observations, such as island provinces, rows with less than 5% missing values per feature, and trimming the data to the desired date range.
+
+## Usage
 
 ### Run Everything
 
@@ -119,10 +135,13 @@ Merges the outputs of the previous processors into a single, unified dataset.
 python3 main.py
 ```
 
-This will:  
-- Check folder structure  
-- Process all datasets  
-- Merge and export final dataset
+This will:
+
+- Check the folder structure
+- Process all datasets individually
+- Merge them into a unified dataset
+- Clean the merged dataset (filter invalid data, handle missing values, trim by date)
+- Export the final dataset
 
 ---
 
@@ -144,7 +163,7 @@ DataMerger().process()
 
 ---
 
-## 🧠 Main Orchestrator
+## Main Orchestrator
 
 The `main.py` script handles the full pipeline execution.
 
@@ -154,17 +173,7 @@ It will:
 - Log progress and performance  
 - Save final versioned dataset to `data/output/`
 
-Console logs include:  
-- Step start/end  
-- Row/column count
-- DataFrame Info
-- Count null values  
-- Time taken  
-- Any exceptions with full tracebacks
-
----
-
-## 🧼 Province Name Standardization
+## Province Name Standardization
 
 To ensure smooth merging, names like `"02 Albacete"` or `"Alicante/Alacant"` are standardized using a JSON mapping.
 
@@ -175,12 +184,11 @@ To ensure smooth merging, names like `"02 Albacete"` or `"Alicante/Alacant"` are
 
 ---
 
-## 📁 Output
+## Output
 
 The final dataset is saved to:
 
 - `data/output/dataset.csv` – latest result  
-- `data/output/dataset_YYYYMMDD_HHMMSS.csv` – versioned snapshot  
 
 **Output Variables**:
 
