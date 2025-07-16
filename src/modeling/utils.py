@@ -40,3 +40,22 @@ def create_directory(path: str) -> None:
     path (str): Path to the directory to create.
     """
     Path(path).mkdir(parents=True, exist_ok=True)
+
+def load_pickle_file(file_path):
+    """
+    Load a pickle file from the specified path.
+    """
+    import joblib
+    return joblib.load(file_path)
+
+def save_pickle_file(data: Any, file_path: str) -> None:
+    """
+    Save data to a pickle file at the specified path.
+
+    Parameters:
+    data (Any): Data to save.
+    file_path (str): Path where the data should be saved.
+    """
+    import joblib
+    create_directory(Path(file_path).parent)
+    joblib.dump(data, file_path)

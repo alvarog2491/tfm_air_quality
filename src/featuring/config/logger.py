@@ -8,7 +8,7 @@ def setup_logger():
     log_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_file = log_dir / f"processing_{timestamp}.log"
+    log_file = log_dir / f"featuring_{timestamp}.log"
 
     logging.basicConfig(
         level=logging.INFO,

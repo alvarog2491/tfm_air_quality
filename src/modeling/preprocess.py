@@ -8,8 +8,13 @@ import joblib
 from utils import load_yaml_config
 from data_utils import load_raw_dataset, separate_train_evaluate_dataset, one_hot_encode_categorical_features, validate_no_missing_values, scale_numerical_features
 import argparse
+import logging
+from config.logger import setup_logger
+
+logger = setup_logger(stage="PREPROCESS")
 
 def main(config_file: str, raw_dataset: str, output_train_dataset: str, output_test_dataset: str) -> None:
+
     # Load configuration
     config = load_yaml_config(config_file)["preprocess"]
     drop_colnames = config["drop_colnames"]
@@ -20,37 +25,37 @@ def main(config_file: str, raw_dataset: str, output_train_dataset: str, output_t
     var_dtypes = config["var_dtypes"]
 
     # Read dataset
-    print("Reading raw data...")
+    logger.info("Reading raw data...")
     dataset = load_raw_dataset(filepath=raw_dataset, drop_columns=drop_colnames, var_dtypes=var_dtypes)
 
-    print("Splitting dataset into training and evaluation sets...")
+    logger.info("Splitting dataset into training and evaluation sets...")
     training_dataset, evaluation_dataset = separate_train_evaluate_dataset(
         df=dataset, size=validation_size)
 
     # Check for missing values
-    print("Checking for missing values...")
+    logger.info("Checking for missing values...")
     training_dataset = validate_no_missing_values(training_dataset)
     evaluation_dataset = validate_no_missing_values(evaluation_dataset)
     
     # One-hot encode categorical columns
-    print("One-hot encoding categorical columns...")
+    logger.info("One-hot encoding categorical columns...")
     training_dataset = one_hot_encode_categorical_features(
         df=training_dataset, categorical_columns=categorical_columns)
     evaluation_dataset = one_hot_encode_categorical_features(
         df=evaluation_dataset, categorical_columns=categorical_columns)
 
     # Scale features
-    print("Scaling features...")
+    logger.info("Scaling features...")
     training_dataset, scaler = scale_numerical_features(
         df=training_dataset, numerical_features=numerical_columns, scaler=None)
     evaluation_dataset, _ = scale_numerical_features(
         df=evaluation_dataset, numerical_features=numerical_columns, scaler=None)
 
     # Write processed dataset
-    print(f"Writing processed data...")
+    logger.info("Writing processed data...")
     training_dataset.to_csv(output_train_dataset, index=None)
     evaluation_dataset.to_csv(output_test_dataset, index=None)
-    print("Done!")
+    logger.info("Done!")
 
 
 if __name__ == "__main__":
