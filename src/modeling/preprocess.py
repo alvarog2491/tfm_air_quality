@@ -5,8 +5,11 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-from utils.file_system_utils import load_yaml_config
-from utils.data_utils import load_raw_dataset, separate_train_evaluate_dataset, one_hot_encode_categorical_features, validate_no_missing_values, scale_numerical_features
+# from src.common.utils import data_utils
+# from src.common.utils import file_utils
+
+from src.common.utils.file_utils import load_yaml_config
+from src.common.utils.data_utils import load_raw_dataset, separate_train_evaluate_dataset, one_hot_encode_categorical_features, validate_no_missing_values, scale_numerical_features
 import argparse
 import logging
 from config.logger import setup_logger
