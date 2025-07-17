@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from data_utils import prepare_features_and_target, one_hot_encode_categorical_features, scale_numerical_features
-from utils import load_yaml_config, create_directory, load_pickle_file
+from utils.data_utils import prepare_features_and_target, one_hot_encode_categorical_features, scale_numerical_features
+from utils.file_system_utils import load_yaml_config, create_directory, load_pickle_file
 
 import argparse
 from config.logger import setup_logger

@@ -2,8 +2,8 @@ import json
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from utils import load_yaml_config
-from data_utils import prepare_features_and_target
+from utils.file_system_utils import load_yaml_config
+from utils.data_utils import prepare_features_and_target
 import joblib
 import argparse
 from config.logger import setup_logger

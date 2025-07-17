@@ -5,8 +5,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-from utils import load_yaml_config
-from data_utils import load_raw_dataset, separate_train_evaluate_dataset, one_hot_encode_categorical_features, validate_no_missing_values, scale_numerical_features
+from utils.file_system_utils import load_yaml_config
+from utils.data_utils import load_raw_dataset, separate_train_evaluate_dataset, one_hot_encode_categorical_features, validate_no_missing_values, scale_numerical_features
 import argparse
 import logging
 from config.logger import setup_logger
@@ -56,7 +56,6 @@ def main(config_file: str, raw_dataset: str, output_train_dataset: str, output_t
     training_dataset.to_csv(output_train_dataset, index=None)
     evaluation_dataset.to_csv(output_test_dataset, index=None)
     logger.info("Done!")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
