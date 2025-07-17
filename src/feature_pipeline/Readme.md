@@ -30,11 +30,13 @@ This module performs common ETL steps to unify **air quality**, **health**, and 
 
 ## Description
 
-This pipeline builds a unified dataset combining three key data types:
+The iteration works as follows: the source_processors folder contains modules responsible for reading the raw CSV files of the following types:
 
-- **Air Quality**: Pollutant levels recorded by sensors across Spain.  
-- **Health**: Life expectancy and deaths related to respiratory diseases by province.  
-- **Socioeconomic**: GDP per capita by province, from 2000 to 2022.  
+* Air Quality — Pollutant levels recorded by sensors across Spain.
+* Health — Life expectancy and respiratory disease-related deaths by province.
+* Socioeconomic — GDP per capita and population size by provinced.
+
+Each processor reads its corresponding CSV file and performs initial operations such as basic data exploration, null value counting, info display, column renaming, and basic cleaning (e.g., removing unwanted characters or merging data of the same nature). After these steps, a cleaned and preprocessed CSV is generated for each dataset and stored in the corresponding output folder.
 
 All records are standardized to share the same structure, using `Province` and `Year` as primary keys.
 
@@ -62,6 +64,7 @@ data/air_quality_data/raw/
 ### Socioeconomic
 
 - [GDP](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736167628&menu=resultados&idp=1254735576581#_tabs-1254736158133) per capita by province from 2000 to 2022
+- [Province population](https://www.ine.es/jaxiT3/Tabla.htm?t=2852)
 ---
 
 ## Data Processing Pipeline

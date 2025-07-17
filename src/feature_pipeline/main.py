@@ -83,7 +83,8 @@ def run_data_processing():
         merger = DataMerger()
         merged_df = merger.merge_all_data(aq_processor.air_quality_df,
                                          health_processor.health_df,
-                                         socio_processor.socioeconomic_df)
+                                         socio_processor.gdp_df,
+                                         socio_processor.province_population_df)
         logging.info(f"Dataset merged succesfully: {len(merged_df)} records, {len(merged_df.columns)} columns")
         
         # Step 5: Data Cleaner

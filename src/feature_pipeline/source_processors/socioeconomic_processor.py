@@ -44,79 +44,121 @@ class SocioeconomicProcessor(BaseProcessor):
         """
         super().__init__(data_folder, "socioeconomic_data")
         # Initialize DataFrame as private attribute
-        self._socioeconomic_df: Optional[pd.DataFrame] = None
+        self._gdp_df: Optional[pd.DataFrame] = None
+        self._province_population_df: Optional[pd.DataFrame] = None
     
     @property
-    def socioeconomic_df(self) -> Optional[pd.DataFrame]:
-        """Get the socioeconomic DataFrame."""
-        return self._socioeconomic_df
+    def gdp_df(self) -> Optional[pd.DataFrame]:
+        """Get the pib DataFrame."""
+        return self._gdp_df
+    
+    @property
+    def province_population_df(self) -> Optional[pd.DataFrame]:
+        """Get the province population size DataFrame."""
+        return self._province_population_df
     
     @property
     def is_loaded(self) -> bool:
         """Check if data has been loaded."""
-        return (self._socioeconomic_df is not None and 
-                not self._socioeconomic_df.empty)
+        return (self._gdp_df is not None and not self._gdp_df.empty and 
+                self._province_population_df is not None and 
+                not self._province_population_df.empty)
     
     def load_csv_files(self) -> None:
         """
-        Load raw socioeconomic data from CSV file
+        Load raw socioeconomic data from CSV files
         
         Raises:
             FileNotFoundError: If the required CSV file is not found
             ValueError: If the loaded file is empty
         """
         self.logger.info(f"Loading raw socioeconomic data from: {self.data_folder}")
-        socioeconomic_file = self.data_folder / "raw" / "PIB per cap provincias 2000-2021.csv"
-        
+        pib_file = self.data_folder / "raw" / "PIB per cap provincias 2000-2021.csv"
+        population_file = self.data_folder / "raw" / "poblacion_provincias.csv"
+
         # Check if file exists before attempting to load
-        if not socioeconomic_file.is_file():
-            raise FileNotFoundError(f"Required file not found: {socioeconomic_file}")
+        if not pib_file.is_file():
+            raise FileNotFoundError(f"Required file not found: {pib_file}")
         
+        if not population_file.is_file():
+            raise FileNotFoundError(f"Required file not found: {population_file}")
+
         try:
             # Load CSV file with appropriate settings for Spanish data
-            self._socioeconomic_df = pd.read_csv(
-                socioeconomic_file,
+            self._gdp_df = pd.read_csv(
+                pib_file,
                 sep=';', 
                 decimal=',',
                 encoding='ISO-8859-1'
             )
             
+            self._province_population_df = pd.read_csv(
+                population_file,
+                parse_dates=['Periodo'],
+                sep=';', 
+                decimal=',', 
+                encoding='latin1'
+             )
             # Validate loaded data
-            self._validate_dataframe_not_empty(self._socioeconomic_df, socioeconomic_file)
-            
+            self._validate_dataframe_not_empty(self._gdp_df, pib_file)
+            self._validate_dataframe_not_empty(self._province_population_df, population_file)
+
             # Log data info
-            self._log_dataframe_info(self._socioeconomic_df, "socioeconomic")
+            self._log_dataframe_info(self._gdp_df, "GDP")
+            self._log_dataframe_info(self._province_population_df, "province population")
             
             # Log data quality info
-            self._log_null_values(self._socioeconomic_df, "socioeconomic")
+            self._log_null_values(self._gdp_df, "GDP")
+            self._log_null_values(self._province_population_df, "province population")
             
         except Exception as e:
             self.logger.error(f"Error loading CSV file: {str(e)}")
             raise
 
-    def tranform_dataframe(self) -> None:
+    def tranform_dataframes(self) -> None:
         """
-        Clean and standardize the loaded DataFrame.
+        Clean and standardize the loaded DataFrames.
         
         Raises:
             ValueError: If data hasn't been loaded yet
         """
         if not self.is_loaded:
             raise ValueError("DataFrame must be loaded before cleaning")
-        
-        # Transform columns
-        self._socioeconomic_df = self._socioeconomic_df.melt(id_vars='Provincia', var_name='anio')
-        self._socioeconomic_df.rename(columns={"value":"pib"}, inplace=True)
-        self._socioeconomic_df.rename(columns={'Provincia': 'Province'}, inplace=True)
-        self._socioeconomic_df['anio'] = pd.to_datetime(self._socioeconomic_df['anio'], format='%Y')
-        self._socioeconomic_df['pib'] = self._socioeconomic_df['pib'].astype(float)
-        self.logger.info(f"Columns transformed {list(self._socioeconomic_df.columns)}")
+
+        self._transform_gdp_columns()
+        self._transform_population_columns()
+    
+    def _transform_gdp_columns(self) -> None:
+        """
+        Transform GDP columns from wide to long format.
+        """
+
+        # Melt the DataFrame to long format
+        self.logger.info("Transforming GDP DataFrame from wide to long format")
+        self._gdp_df = self._gdp_df.melt(id_vars='Provincia', var_name='anio')
+        self._gdp_df.rename(columns={"value": "pib"}, inplace=True)
+        self._gdp_df.rename(columns={'Provincia': 'Province'}, inplace=True)
+        self._gdp_df['anio'] = pd.to_datetime(self._gdp_df['anio'], format='%Y')
+        self._gdp_df['pib'] = self._gdp_df['pib'].astype(float)
+
+    def _transform_population_columns(self) -> None:
+        """
+            Clean population size dataframe
+        """
+        self.logger.info("Transforming province population DataFrame")
+        self._province_population_df.rename(columns={'Total': 'Population'}, inplace=True)
+        # Clean province names by removing numeric codes and extra spaces
+        if 'Provincias' in self._province_population_df.columns:
+            self._province_population_df['Provincias'] = self._province_population_df['Provincias'].str.replace(r'[0-9\s]+', '', regex=True)
+            self._province_population_df.rename(columns={'Provincias': 'Province'}, inplace=True)
+            self.logger.info(f"Removed numeric codes on province names in Province population dataset")
 
     def map_province_names(self) -> None:
         """
         Unify province names in the dataframe
         """
-        self._socioeconomic_df = ProvinceMapper.map_province_name("socioeconomic", self._socioeconomic_df)
+        self._gdp_df = ProvinceMapper.map_province_name("gdp", self._gdp_df)
+        self._province_population_df = ProvinceMapper.map_province_name("province_population", self._province_population_df)
 
     def save_processed_file(self) -> None:
         """
@@ -125,7 +167,8 @@ class SocioeconomicProcessor(BaseProcessor):
         Raises:
             ValueError: If no data is available to save
         """
-        self._save_dataframe_to_csv(self._socioeconomic_df, "socioeconomic.csv")
+        self._save_dataframe_to_csv(self._gdp_df, "province_gdp.csv")
+        self._save_dataframe_to_csv(self._province_population_df, "province_population_size.csv")
 
     def process(self) -> None:
         """
@@ -133,7 +176,7 @@ class SocioeconomicProcessor(BaseProcessor):
         """
         try:
             self.load_csv_files()
-            self.tranform_dataframe()
+            self.tranform_dataframes()
             self.map_province_names()
             self.save_processed_file()
             
