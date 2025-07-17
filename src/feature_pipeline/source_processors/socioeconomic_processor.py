@@ -14,7 +14,7 @@ OUTPUT: Normalized long format
 
 PROCESSING:
 - Loads CSV with Spanish locale settings (semicolon separator, comma decimal)
-- Melts wide format to long format using pandas.melt()
+- Melts wide format to long format using pandas.melt()Ø
 - Standardizes province names and converts data types
 - Exports to "socioeconomic.csv"
 
@@ -22,7 +22,7 @@ USAGE: processor = SocioeconomicProcessor(); processor.process()
 """
 
 
-from processors.base_processor import BaseProcessor
+from source_processors.base_processor import BaseProcessor
 from typing import Optional
 from pathlib import Path
 

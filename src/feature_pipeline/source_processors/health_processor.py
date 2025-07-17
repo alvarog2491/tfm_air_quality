@@ -32,7 +32,7 @@ PROCESSING:
 USAGE: processor = HealthProcessor(); processor.process()
 """
 
-from processors.base_processor import BaseProcessor
+from source_processors.base_processor import BaseProcessor
 from typing import Optional, Dict
 from pathlib import Path
 

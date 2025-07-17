@@ -1,6 +1,6 @@
 # Multi-Source Data Pipeline
 
-A data processing pipeline that integrates **air quality**, **health**, and **socioeconomic** datasets from official sources across Spanish provinces. It cleans and merges the data into a unified dataset with the engineered features needed for analysis or machine learning.
+This module performs common ETL steps to unify **air quality**, **health**, and **socioeconomic** datasets from official sources across Spanish provinces. It handles data loading, initial handling, cleaning, merging, and feature engineering to produce a single, unified dataset ready for analysis or machine learning.
 
 ---
 
@@ -62,7 +62,6 @@ data/air_quality_data/raw/
 ### Socioeconomic
 
 - [GDP](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736167628&menu=resultados&idp=1254735576581#_tabs-1254736158133) per capita by province from 2000 to 2022
-
 ---
 
 ## Data Processing Pipeline

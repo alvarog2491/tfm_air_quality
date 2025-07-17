@@ -58,28 +58,28 @@ def run_data_processing():
     try:
         # Step 1: Process air quality data
         logging.info("============ Starting air quality data processing ============")
-        from processors.air_quality_processor import AirQualityProcessor
+        from source_processors.air_quality_processor import AirQualityProcessor
         aq_processor = AirQualityProcessor()
         aq_processor.process()
         logging.info(f"Air quality data processed succesfully")
         
         # Step 2: Process health data
         logging.info("============ Starting health data processing ============")
-        from processors.health_processor import HealthProcessor
+        from source_processors.health_processor import HealthProcessor
         health_processor = HealthProcessor()
         health_processor.process()
         logging.info(f"Health data processed succesfully")
         
         # Step 3: Process socioeconomic data
         logging.info("============ Starting socioeconomic data processing ============")
-        from processors.socioeconomic_processor import SocioeconomicProcessor
+        from source_processors.socioeconomic_processor import SocioeconomicProcessor
         socio_processor = SocioeconomicProcessor()
         socio_processor.process()
         logging.info(f"Socioeconomic data processed succesfully")
         
         # Step 4: Merge all datasets
         logging.info("============ Starting dataset merging ============")
-        from processors.data_merger import DataMerger
+        from pipeline_steps.dataset_merger import DataMerger
         merger = DataMerger()
         merged_df = merger.merge_all_data(aq_processor.air_quality_df,
                                          health_processor.health_df,
@@ -88,7 +88,7 @@ def run_data_processing():
         
         # Step 5: Data Cleaner
         logging.info("============ Starting dataset cleaner ============")
-        from processors.dataset_cleaner import DatasetCleaner
+        from pipeline_steps.dataset_cleaner import DatasetCleaner
         cleaner = DatasetCleaner()
         final_df = cleaner.clean_dataset(merged_df)
 
