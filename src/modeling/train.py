@@ -2,11 +2,13 @@ import json
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from utils import load_yaml_config
-from data_utils import prepare_features_and_target
+from common.utils.file_utils import load_yaml_config
+from common.utils.data_utils import prepare_features_and_target
 import joblib
 import argparse
+from config.logger import setup_logger
 
+logger = setup_logger(stage="TRAIN")
 
 def main(config_file: str, processed_dataset: str, output_model: str):
     # Load configuration
@@ -19,31 +21,29 @@ def main(config_file: str, processed_dataset: str, output_model: str):
     test_size = config["train_test_split"]["test_size"]
     
     # Load and split the dataset
-    print("Loading and splitting the dataset...")
+    logger.info("Loading and splitting the dataset...")
     X, y = prepare_features_and_target(processed_dataset, target_column, shuffle, shuffle_random_state)
 
     # Split the dataset
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state
     )
-    print(f"Dataset shape: {X.shape}")
-    print(f"Train set shape: {X_train.shape}")
-    print(f"Test set shape: {X_test.shape}")
+    logger.info(f"Dataset shape: {X.shape}")
+    logger.info(f"Train set shape: {X_train.shape}")
+    logger.info(f"Test set shape: {X_test.shape}")
 
     # Train and evaluate the model
-    print("Training and evaluating the model...")
+    logger.info("Training and evaluating the model...")
     if model_type == "linear_regression":
         from linear_regression.linear_regression import LinearRegressionModel
         model = LinearRegressionModel()
         model.train(X_train, y_train)
 
-
     metrics = model.evaluate(X_test, y_test)
     joblib.dump(model, output_model)
-    print("====================Test Set Metrics==================")
-    print(json.dumps(metrics, indent=2))
-    print("======================================================")
-
+    logger.info("====================Test Set Metrics==================")
+    logger.info(json.dumps(metrics, indent=2))
+    logger.info("======================================================")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

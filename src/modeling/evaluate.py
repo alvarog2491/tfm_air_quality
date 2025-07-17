@@ -2,10 +2,13 @@ import json
 from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from data_utils import prepare_features_and_target, one_hot_encode_categorical_features, scale_numerical_features
-from utils import load_yaml_config, create_directory
+from common.utils.data_utils import prepare_features_and_target, one_hot_encode_categorical_features, scale_numerical_features
+from common.utils.file_utils import load_yaml_config, create_directory, load_pickle_file
 
 import argparse
+from config.logger import setup_logger
+
+logger = setup_logger(stage="EVALUATE")
 
 def evaluate_model(model, X_test, y_test):
     """
@@ -13,13 +16,6 @@ def evaluate_model(model, X_test, y_test):
     """
     metrics = model.evaluate(X_test, y_test)
     return metrics
-
-def load_pickle_file(file_path):
-    """
-    Load a pickle file from the specified path.
-    """
-    import joblib
-    return joblib.load(file_path)
 
 def save_metrics(metrics, output_file):
     """
@@ -37,7 +33,7 @@ def main(
     output_metrics: str,
 ):
     # Load configuration
-    print("Loading configuration...")
+    logger.info("Loading configuration...")
     config = load_yaml_config(config_file)["evaluate"]
     target_column = config["target_column"]
     shuffle = config["shuffle"]
@@ -45,27 +41,27 @@ def main(
     var_dtypes = config["var_dtypes"]
 
     # Loading dataset
-    print("Loading and splitting the dataset...")
+    logger.info("Loading and splitting the dataset...")
     X, y = prepare_features_and_target(evaluation_dataset, target_column, shuffle, shuffle_random_state, var_dtypes=var_dtypes)
-    print(f"Dataset X shape: {X.shape}")
-    print(f"Dataset y shape: {y.shape}")
+    logger.info(f"Dataset X shape: {X.shape}")
+    logger.info(f"Dataset y shape: {y.shape}")
 
     # Load the trained model
-    print("Loading the trained model...")
+    logger.info("Loading the trained model...")
     model = load_pickle_file(model_file) 
 
     # Evaluate the model
-    print("Evaluating the model...")
+    logger.info("Evaluating the model...")
     metrics = evaluate_model(model, X, y)
 
-    print("====================Test Set Metrics==================")
-    print(json.dumps(metrics, indent=2))
-    print("======================================================")
+    logger.info("====================Test Set Metrics==================")
+    logger.info(json.dumps(metrics, indent=2))
+    logger.info("======================================================")
     save_metrics(metrics, output_metrics)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-    description="Evaluate Air Quality prediction model"
+        description="Evaluate Air Quality prediction model"
     )
     parser.add_argument(
         "config_file",
