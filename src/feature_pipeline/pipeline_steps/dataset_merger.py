@@ -67,7 +67,7 @@ class DataMerger:
             )
 
             # Clean up duplicate columns
-            merged_df.drop(columns=['Periodo', 'anio', 'Sexo', 'Periodo_y'], inplace=True, errors='ignore')
+            merged_df.drop(columns=['Periodo', 'anio', 'Sexo', 'Periodo_x', 'Periodo_y'], inplace=True, errors='ignore')
             return merged_df
             
         except Exception as e:

@@ -87,6 +87,12 @@ def run_data_processing():
                                          socio_processor.province_population_df)
         logging.info(f"Dataset merged succesfully: {len(merged_df)} records, {len(merged_df.columns)} columns")
         
+        # Step 5: Feature Engineering
+        logging.info("============ Starting feature engineering ============")
+        from pipeline_steps.feature_engineering import FeatureEngineering
+        feature_engineering = FeatureEngineering()
+        merged_df = feature_engineering.apply(merged_df)
+
         # Step 5: Data Cleaner
         logging.info("============ Starting dataset cleaner ============")
         from pipeline_steps.dataset_cleaner import DatasetCleaner
