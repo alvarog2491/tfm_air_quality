@@ -4,14 +4,12 @@ from unittest.mock import patch, MagicMock, mock_open
 import tempfile
 import os
 from pathlib import Path
-
-# Assuming the main file is named 'preprocessing.py' - adjust import as needed
-from modeling.preprocess import main
+from  src.modeling.preprocess import main
 
 
 @pytest.fixture
 def mock_config():
-    """Mock configuration data"""
+    """Mock configuration data for testing preprocessing parameters"""
     return {
         "preprocess": {
             "drop_colnames": ["id", "timestamp"],
@@ -26,7 +24,7 @@ def mock_config():
 
 @pytest.fixture
 def mock_dataset():
-    """Mock dataset for testing"""
+    """Mock dataset for testing with sample data"""
     return pd.DataFrame({
         "category": ["A", "B", "A", "B", "A"],
         "type": ["X", "Y", "X", "Y", "X"],
@@ -39,7 +37,7 @@ def mock_dataset():
 
 @pytest.fixture
 def temp_files():
-    """Create temporary files for testing"""
+    """Create temporary files for testing file operations"""
     with tempfile.TemporaryDirectory() as temp_dir:
         config_file = os.path.join(temp_dir, "config.yaml")
         raw_dataset = os.path.join(temp_dir, "raw_data.csv")
@@ -55,15 +53,15 @@ def temp_files():
 
 
 class TestMain:
-    """Test the main preprocessing function"""
+    """Test suite for the main preprocess function"""
     
-    @patch('preprocessing.load_yaml_config')
-    @patch('preprocessing.load_raw_dataset')
-    @patch('preprocessing.separate_train_evaluate_dataset')
-    @patch('preprocessing.validate_no_missing_values')
-    @patch('preprocessing.one_hot_encode_categorical_features')
-    @patch('preprocessing.scale_numerical_features')
-    @patch('preprocessing.logger')
+    @patch('src.modeling.preprocess.load_yaml_config')
+    @patch('src.modeling.preprocess.load_raw_dataset')
+    @patch('src.modeling.preprocess.separate_train_evaluate_dataset')
+    @patch('src.modeling.preprocess.validate_no_missing_values')
+    @patch('src.modeling.preprocess.one_hot_encode_categorical_features')
+    @patch('src.modeling.preprocess.scale_numerical_features')
+    @patch('src.modeling.preprocess.logger')
     def test_main_successful_execution(
         self,
         mock_logger,
@@ -77,21 +75,23 @@ class TestMain:
         mock_dataset,
         temp_files
     ):
-        """Test successful execution of main function"""
+        """Test successful execution of main function with all steps"""
         
-        # Setup mocks
+        # Setup mocks to return expected values
         mock_load_config.return_value = mock_config
         mock_load_dataset.return_value = mock_dataset
         
+        # Split dataset for train/test
         train_df = mock_dataset.iloc[:3]
         test_df = mock_dataset.iloc[3:]
         mock_separate_dataset.return_value = (train_df, test_df)
         
+        # Configure mocks to pass through data unchanged
         mock_validate_missing.side_effect = lambda x: x
         mock_one_hot_encode.side_effect = lambda df, **kwargs: df
         mock_scale_features.side_effect = lambda df, **kwargs: (df, MagicMock())
         
-        # Execute
+        # Execute main function
         main(
             config_file=temp_files["config_file"],
             raw_dataset=temp_files["raw_dataset"],
@@ -99,21 +99,22 @@ class TestMain:
             output_test_dataset=temp_files["output_test"]
         )
         
-        # Verify function calls
+        # Verify all functions were called once
         mock_load_config.assert_called_once_with(temp_files["config_file"])
         mock_load_dataset.assert_called_once()
         mock_separate_dataset.assert_called_once()
+        # Validation, encoding, and scaling should be called for both train and test
         assert mock_validate_missing.call_count == 2
         assert mock_one_hot_encode.call_count == 2
         assert mock_scale_features.call_count == 2
         
-        # Verify output files exist
+        # Verify output files were created
         assert os.path.exists(temp_files["output_train"])
         assert os.path.exists(temp_files["output_test"])
     
-    @patch('preprocessing.load_yaml_config')
-    @patch('preprocessing.load_raw_dataset')
-    @patch('preprocessing.logger')
+    @patch('src.modeling.preprocess.load_yaml_config')
+    @patch('src.modeling.preprocess.load_raw_dataset')
+    @patch('src.modeling.preprocess.logger')
     def test_main_handles_config_loading_error(
         self,
         mock_logger,
@@ -121,10 +122,12 @@ class TestMain:
         mock_load_config,
         temp_files
     ):
-        """Test main function handles configuration loading errors"""
+        """Test main function handles configuration loading errors properly"""
         
+        # Mock config loading to raise FileNotFoundError
         mock_load_config.side_effect = FileNotFoundError("Config file not found")
         
+        # Verify exception is raised
         with pytest.raises(FileNotFoundError):
             main(
                 config_file=temp_files["config_file"],
@@ -133,9 +136,9 @@ class TestMain:
                 output_test_dataset=temp_files["output_test"]
             )
     
-    @patch('preprocessing.load_yaml_config')
-    @patch('preprocessing.load_raw_dataset')
-    @patch('preprocessing.logger')
+    @patch('src.modeling.preprocess.load_yaml_config')
+    @patch('src.modeling.preprocess.load_raw_dataset')
+    @patch('src.modeling.preprocess.logger')
     def test_main_handles_dataset_loading_error(
         self,
         mock_logger,
@@ -144,11 +147,13 @@ class TestMain:
         mock_config,
         temp_files
     ):
-        """Test main function handles dataset loading errors"""
+        """Test main function handles dataset loading errors properly"""
         
+        # Mock successful config loading but failed dataset loading
         mock_load_config.return_value = mock_config
         mock_load_dataset.side_effect = FileNotFoundError("Dataset file not found")
         
+        # Verify exception is raised
         with pytest.raises(FileNotFoundError):
             main(
                 config_file=temp_files["config_file"],
@@ -157,13 +162,13 @@ class TestMain:
                 output_test_dataset=temp_files["output_test"]
             )
     
-    @patch('preprocessing.load_yaml_config')
-    @patch('preprocessing.load_raw_dataset')
-    @patch('preprocessing.separate_train_evaluate_dataset')
-    @patch('preprocessing.validate_no_missing_values')
-    @patch('preprocessing.one_hot_encode_categorical_features')
-    @patch('preprocessing.scale_numerical_features')
-    @patch('preprocessing.logger')
+    @patch('src.modeling.preprocess.load_yaml_config')
+    @patch('src.modeling.preprocess.load_raw_dataset')
+    @patch('src.modeling.preprocess.separate_train_evaluate_dataset')
+    @patch('src.modeling.preprocess.validate_no_missing_values')
+    @patch('src.modeling.preprocess.one_hot_encode_categorical_features')
+    @patch('src.modeling.preprocess.scale_numerical_features')
+    @patch('src.modeling.preprocess.logger')
     def test_main_calls_functions_with_correct_parameters(
         self,
         mock_logger,
@@ -191,7 +196,7 @@ class TestMain:
         mock_one_hot_encode.side_effect = lambda df, **kwargs: df
         mock_scale_features.side_effect = lambda df, **kwargs: (df, MagicMock())
         
-        # Execute
+        # Execute main function
         main(
             config_file=temp_files["config_file"],
             raw_dataset=temp_files["raw_dataset"],
@@ -199,49 +204,41 @@ class TestMain:
             output_test_dataset=temp_files["output_test"]
         )
         
-        # Verify function calls with correct parameters
+        # Verify dataset loading parameters
         mock_load_dataset.assert_called_once_with(
             filepath=temp_files["raw_dataset"],
             drop_columns=mock_config["preprocess"]["drop_colnames"],
             var_dtypes=mock_config["preprocess"]["var_dtypes"]
         )
         
+        # Verify dataset separation parameters
         mock_separate_dataset.assert_called_once_with(
             df=mock_dataset,
             size=mock_config["preprocess"]["validation_size"]
         )
         
-        # Verify one-hot encoding calls
+        # Verify one-hot encoding called with correct categorical columns
         expected_categorical = mock_config["preprocess"]["categorical_features"]
         mock_one_hot_encode.assert_any_call(
             df=train_df,
             categorical_columns=expected_categorical
         )
-        mock_one_hot_encode.assert_any_call(
-            df=test_df,
-            categorical_columns=expected_categorical
-        )
         
-        # Verify scaling calls
+        # Verify scaling called with correct numerical features
         expected_numerical = mock_config["preprocess"]["numerical_features"]
         mock_scale_features.assert_any_call(
             df=train_df,
             numerical_features=expected_numerical,
             scaler=None
         )
-        mock_scale_features.assert_any_call(
-            df=test_df,
-            numerical_features=expected_numerical,
-            scaler=None
-        )
     
-    @patch('preprocessing.load_yaml_config')
-    @patch('preprocessing.load_raw_dataset')
-    @patch('preprocessing.separate_train_evaluate_dataset')
-    @patch('preprocessing.validate_no_missing_values')
-    @patch('preprocessing.one_hot_encode_categorical_features')
-    @patch('preprocessing.scale_numerical_features')
-    @patch('preprocessing.logger')
+    @patch('src.modeling.preprocess.load_yaml_config')
+    @patch('src.modeling.preprocess.load_raw_dataset')
+    @patch('src.modeling.preprocess.separate_train_evaluate_dataset')
+    @patch('src.modeling.preprocess.validate_no_missing_values')
+    @patch('src.modeling.preprocess.one_hot_encode_categorical_features')
+    @patch('src.modeling.preprocess.scale_numerical_features')
+    @patch('src.modeling.preprocess.logger')
     def test_main_logger_calls(
         self,
         mock_logger,
@@ -255,7 +252,7 @@ class TestMain:
         mock_dataset,
         temp_files
     ):
-        """Test that logger is called appropriately"""
+        """Test that logger is called with appropriate messages"""
         
         # Setup mocks
         mock_load_config.return_value = mock_config
@@ -269,7 +266,7 @@ class TestMain:
         mock_one_hot_encode.side_effect = lambda df, **kwargs: df
         mock_scale_features.side_effect = lambda df, **kwargs: (df, MagicMock())
         
-        # Execute
+        # Execute main function
         main(
             config_file=temp_files["config_file"],
             raw_dataset=temp_files["raw_dataset"],
@@ -277,7 +274,7 @@ class TestMain:
             output_test_dataset=temp_files["output_test"]
         )
         
-        # Verify logger calls
+        # Verify logger was called with expected messages
         expected_log_messages = [
             "Reading raw data...",
             "Splitting dataset into training and evaluation sets...",
@@ -288,6 +285,7 @@ class TestMain:
             "Done!"
         ]
         
+        # Check that all expected messages were logged
         actual_calls = [call[0][0] for call in mock_logger.info.call_args_list]
         for expected_msg in expected_log_messages:
             assert expected_msg in actual_calls

@@ -9,7 +9,7 @@ from common.utils.file_utils import load_yaml_config
 from common.utils.data_utils import load_raw_dataset, separate_train_evaluate_dataset, one_hot_encode_categorical_features, validate_no_missing_values, scale_numerical_features
 import argparse
 import logging
-from config.logger import setup_logger
+from modeling.config.logger import setup_logger
 
 logger = setup_logger(stage="PREPROCESS")
 
