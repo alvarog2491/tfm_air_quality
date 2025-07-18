@@ -9,10 +9,10 @@ This module performs ETL operations to unify air **quality**, **health**, and **
 - [Multi-Source Data Pipeline](#multi-source-data-pipeline)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
-  - [The pipeline processes three data types through dedicated processors, merges them into a unified dataset, and applies feature engineering and validation steps.](#the-pipeline-processes-three-data-types-through-dedicated-processors-merges-them-into-a-unified-dataset-and-applies-feature-engineering-and-validation-steps)
-  - [Air Quality](#air-quality)
-  - [Health](#health)
-  - [Socioeconomic](#socioeconomic)
+  - [Raw sources](#raw-sources)
+    - [Air Quality](#air-quality)
+    - [Health](#health)
+    - [Socioeconomic](#socioeconomic)
 - [Processing Pipeline](#processing-pipeline)
   - [1. Source procesors](#1-source-procesors)
     - [Air Quality Processor](#air-quality-processor)
@@ -34,20 +34,18 @@ This module performs ETL operations to unify air **quality**, **health**, and **
 ## Overview
 
 The pipeline processes three data types through dedicated processors, merges them into a unified dataset, and applies feature engineering and validation steps.
+
 ---
-
-## Air Quality
-
+## Raw sources
+### Air Quality 
 - [EEA (European Environment Agency)](https://discomap.eea.europa.eu/App/AQViewer/index.html?fqn=Airquality_Dissem.b2g.AirQualityStatistics&Country=Spain&inAQReportYN=Yes):  Data for PM2.5, PM10, NO2, SO2, O3  pollutants accross Spanish provinces.
 - [BOE](https://www.boe.es/buscar/doc.php?id=BOE-A-2020-10426): Classification of air quality into 6 categories (from "buena" to "extremadamente desfavorable")
 
-## Health
-
+### Health
 - [INE – Mortality Data](https://www.ine.es/jaxiT3/Tabla.htm?t=9935&L=0): Deaths due to respiratory system diseases (codes 062–067)  
 - [INE – Life Expectancy](https://www.ine.es/jaxiT3/Tabla.htm?t=1485): Life expectancy by province and gender
 
-## Socioeconomic
-
+### Socioeconomic
 - [GDP](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736167628&menu=resultados&idp=1254735576581#_tabs-1254736158133) per capita by province from 2000 to 2022
 - [Province population](https://www.ine.es/jaxiT3/Tabla.htm?t=2852) size of each province in a specific year
 ---
@@ -55,11 +53,13 @@ The pipeline processes three data types through dedicated processors, merges the
 # Processing Pipeline
 
 ## 1. Source procesors
-Each processor handles raw CSV files for a specific data type:
+Each processor handles raw CSV files for a specific data type. 
+
+Within each source processor, province names are standardized according to [Province Name Standardization](#province-name-standardization)
 
 ### Air Quality Processor
 
-Reads pollutant data and adds a classification column based on thresholds, collected from BOE y se estandarizan los nombres de las provincias.
+Reads pollutant data remove unnecessary columns and adds a classification column based on thresholds, collected from BOE.
 
 **Input**: `"air_quality_with_province.csv"`  
 **Output**: Same + air quality classification
@@ -78,7 +78,7 @@ Reads pollutant data and adds a classification column based on thresholds, colle
 
 ### Health Processor
 
-Combines mortality and life expectancy data into a unified format y se estandarizan los nombres de las provincias.
+Combines mortality and life expectancy data into a unified format.
 
 **Input**:  
 - `"enfermedades_respiratorias.csv"`  
@@ -94,7 +94,7 @@ Combines mortality and life expectancy data into a unified format y se estandari
 
 ### Socioeconomic Processor
 
-Converts wide-format GDP data into long format y se estandarizan los nombres de las provincias.
+Converts wide-format GDP data into long format.
 
 **Input**: `"PIB per cap provincias 2000-2021.csv"`  
 **Output**:
@@ -103,29 +103,29 @@ Converts wide-format GDP data into long format y se estandarizan los nombres de 
 |----------|------------|----------------|
 | Alava    | 2000-01-01 | 22134.0        |
 
-Population Size, se descartan las columnas innecesarias y se estandarizan los nombres de las provincias.
+Population Size — unnecessary columns are discarded.
 
-**Input**: `"poblacion_provincias.csv"`
+**Input**: `"poblacion_provincias.csv"`  
 **Output**:
 
 | Province | Year        | Population   |
 |----------|-------------|--------------|
-| Albacete | 2021-01-01  | 386464.      |
+| Albacete | 2021-01-01  | 386464       |
 
 ---
 
-## Pipeline steps
+## 2. Pipeline steps
 
 ### Merge
 
 Combines all processed datasets using standardized province names and year as primary keys.
 
-#### Feature engineering
+### Feature engineering
 
 Creates new variables:
 * **respiratory_deaths_per_100k** Respiratory deaths per 100,000 inhabitants
 
-#### Clean
+### Clean
 
 Removes unnecessary data:
 
@@ -133,7 +133,7 @@ Removes unnecessary data:
 * rows with less than 5% missing values per feature (>5% Warning is thrown)
 * Data outside 2000-2021 range
 
-#### Validate
+### Validate
 Ensures data integrity:
 
 * No null values in final dataset
