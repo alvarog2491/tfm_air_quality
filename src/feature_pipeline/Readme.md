@@ -1,6 +1,6 @@
 # Multi-Source Data Pipeline
 
-This module performs common ETL steps to unify **air quality**, **health**, and **socioeconomic** datasets from official sources across Spanish provinces. It handles data loading, initial handling, cleaning, merging, and feature engineering to produce a single, unified dataset ready for analysis or machine learning.
+This module performs ETL operations to unify air **quality**, **health**, and **socioeconomic** datasets from official Spanish sources into a single dataset ready for analysis or machine learning.
 
 ---
 
@@ -8,72 +8,58 @@ This module performs common ETL steps to unify **air quality**, **health**, and 
 
 - [Multi-Source Data Pipeline](#multi-source-data-pipeline)
   - [Table of Contents](#table-of-contents)
-  - [Description](#description)
-  - [Data Sources](#data-sources)
-    - [Air Quality](#air-quality)
-    - [Health](#health)
-    - [Socioeconomic](#socioeconomic)
-  - [Data Processing Pipeline](#data-processing-pipeline)
-    - [Air Quality](#air-quality-1)
-    - [Health](#health-1)
-    - [Socioeconomic](#socioeconomic-1)
+  - [Overview](#overview)
+  - [The pipeline processes three data types through dedicated processors, merges them into a unified dataset, and applies feature engineering and validation steps.](#the-pipeline-processes-three-data-types-through-dedicated-processors-merges-them-into-a-unified-dataset-and-applies-feature-engineering-and-validation-steps)
+  - [Air Quality](#air-quality)
+  - [Health](#health)
+  - [Socioeconomic](#socioeconomic)
+- [Processing Pipeline](#processing-pipeline)
+  - [1. Source procesors](#1-source-procesors)
+    - [Air Quality Processor](#air-quality-processor)
+    - [Health Processor](#health-processor)
+    - [Socioeconomic Processor](#socioeconomic-processor)
+  - [Pipeline steps](#pipeline-steps)
     - [Merge](#merge)
-    - [Cleansd](#cleansd)
+      - [Feature engineering](#feature-engineering)
+      - [Clean](#clean)
+      - [Validate](#validate)
+  - [Province Name Standardization](#province-name-standardization)
   - [Usage](#usage)
     - [Run Everything](#run-everything)
-    - [Run Individual Steps](#run-individual-steps)
   - [Main Orchestrator](#main-orchestrator)
-  - [Province Name Standardization](#province-name-standardization)
   - [Output](#output)
 
 ---
 
-## Description
+## Overview
 
-The iteration works as follows: the source_processors folder contains modules responsible for reading the raw CSV files of the following types:
-
-* Air Quality — Pollutant levels recorded by sensors across Spain.
-* Health — Life expectancy and respiratory disease-related deaths by province.
-* Socioeconomic — GDP per capita and population size by provinced.
-
-Each processor reads its corresponding CSV file and performs initial operations such as basic data exploration, null value counting, info display, column renaming, and basic cleaning (e.g., removing unwanted characters or merging data of the same nature). After these steps, a cleaned and preprocessed CSV is generated for each dataset and stored in the corresponding output folder.
-
-All records are standardized to share the same structure, using `Province` and `Year` as primary keys.
-
+The pipeline processes three data types through dedicated processors, merges them into a unified dataset, and applies feature engineering and validation steps.
 ---
 
-## Data Sources
+## Air Quality
 
-All CSV files have been downloaded from the official links listed below. The raw data for each category can be found in the corresponding folder under data/*type*/raw/.
-For example, air pollution data is located at:
-data/air_quality_data/raw/
-
-### Air Quality
-
-- [EEA (European Environment Agency)](https://discomap.eea.europa.eu/App/AQViewer/index.html?fqn=Airquality_Dissem.b2g.AirQualityStatistics&Country=Spain&inAQReportYN=Yes):  
-  Data for PM2.5, PM10, NO2, SO2, O3  
+- [EEA (European Environment Agency)](https://discomap.eea.europa.eu/App/AQViewer/index.html?fqn=Airquality_Dissem.b2g.AirQualityStatistics&Country=Spain&inAQReportYN=Yes):  Data for PM2.5, PM10, NO2, SO2, O3  pollutants accross Spanish provinces.
 - [BOE](https://www.boe.es/buscar/doc.php?id=BOE-A-2020-10426): Classification of air quality into 6 categories (from "buena" to "extremadamente desfavorable")
 
-### Health
+## Health
 
-- [INE – Mortality Data](https://www.ine.es/jaxiT3/Tabla.htm?t=9935&L=0):  
-  Deaths due to respiratory system diseases (codes 062–067)  
-- [INE – Life Expectancy](https://www.ine.es/jaxiT3/Tabla.htm?t=1485):  
-  Life expectancy by province and gender
+- [INE – Mortality Data](https://www.ine.es/jaxiT3/Tabla.htm?t=9935&L=0): Deaths due to respiratory system diseases (codes 062–067)  
+- [INE – Life Expectancy](https://www.ine.es/jaxiT3/Tabla.htm?t=1485): Life expectancy by province and gender
 
-### Socioeconomic
+## Socioeconomic
 
 - [GDP](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736167628&menu=resultados&idp=1254735576581#_tabs-1254736158133) per capita by province from 2000 to 2022
-- [Province population](https://www.ine.es/jaxiT3/Tabla.htm?t=2852)
+- [Province population](https://www.ine.es/jaxiT3/Tabla.htm?t=2852) size of each province in a specific year
 ---
 
-## Data Processing Pipeline
+# Processing Pipeline
 
-The pipeline runs in four phases:
+## 1. Source procesors
+Each processor handles raw CSV files for a specific data type:
 
-### Air Quality
+### Air Quality Processor
 
-Reads pollutant data and adds a classification column based on thresholds, collected from BOE.
+Reads pollutant data and adds a classification column based on thresholds, collected from BOE y se estandarizan los nombres de las provincias.
 
 **Input**: `"air_quality_with_province.csv"`  
 **Output**: Same + air quality classification
@@ -90,9 +76,9 @@ Reads pollutant data and adds a classification column based on thresholds, colle
 
 ---
 
-### Health
+### Health Processor
 
-Combines mortality and life expectancy data into a unified format.
+Combines mortality and life expectancy data into a unified format y se estandarizan los nombres de las provincias.
 
 **Input**:  
 - `"enfermedades_respiratorias.csv"`  
@@ -106,9 +92,9 @@ Combines mortality and life expectancy data into a unified format.
 
 ---
 
-### Socioeconomic
+### Socioeconomic Processor
 
-Converts wide-format GDP data into long format.
+Converts wide-format GDP data into long format y se estandarizan los nombres de las provincias.
 
 **Input**: `"PIB per cap provincias 2000-2021.csv"`  
 **Output**:
@@ -117,64 +103,42 @@ Converts wide-format GDP data into long format.
 |----------|------------|----------------|
 | Alava    | 2000-01-01 | 22134.0        |
 
+Population Size, se descartan las columnas innecesarias y se estandarizan los nombres de las provincias.
+
+**Input**: `"poblacion_provincias.csv"`
+**Output**:
+
+| Province | Year        | Population   |
+|----------|-------------|--------------|
+| Albacete | 2021-01-01  | 386464.      |
+
 ---
+
+## Pipeline steps
 
 ### Merge
 
-Merges the outputs of the previous processors into a single, unified dataset.
+Combines all processed datasets using standardized province names and year as primary keys.
 
----
+#### Feature engineering
 
-### Cleansd
+Creates new variables:
+* **respiratory_deaths_per_100k** Respiratory deaths per 100,000 inhabitants
 
-Clean the merged dataset by removing unnecessary observations, such as island provinces, rows with less than 5% missing values per feature, and trimming the data to the desired date range.
+#### Clean
 
-## Usage
+Removes unnecessary data:
 
-### Run Everything
+* island provinces
+* rows with less than 5% missing values per feature (>5% Warning is thrown)
+* Data outside 2000-2021 range
 
-```bash
-python3 main.py
-```
+#### Validate
+Ensures data integrity:
 
-This will:
-
-- Check the folder structure
-- Process all datasets individually
-- Merge them into a unified dataset
-- Clean the merged dataset (filter invalid data, handle missing values, trim by date)
-- Export the final dataset
-
----
-
-### Run Individual Steps
-
-```python
-from processors.AirQualityProcessor import AirQualityProcessor
-AirQualityProcessor().process()
-
-from processors.HealthProcessor import HealthProcessor
-HealthProcessor().process()
-
-from processors.SocioeconomicProcessor import SocioeconomicProcessor
-SocioeconomicProcessor().process()
-
-from processors.DataMerger import DataMerger
-DataMerger().process()
-```
-
----
-
-## Main Orchestrator
-
-The `main.py` script handles the full pipeline execution.
-
-It will:  
-- Verify folder structure  
-- Run each processor step-by-step  
-- Log progress and performance  
-- Save final versioned dataset to `data/output/`
-
+* No null values in final dataset
+* Correct data types for all features
+  
 ## Province Name Standardization
 
 To ensure smooth merging, names like `"02 Albacete"` or `"Alicante/Alacant"` are standardized using a JSON mapping.
@@ -186,11 +150,30 @@ To ensure smooth merging, names like `"02 Albacete"` or `"Alicante/Alacant"` are
 
 ---
 
+## Usage
+
+### Run Everything
+
+```bash
+python3 main.py
+```
+
+---
+
+## Main Orchestrator
+
+The `main.py` script orchestrates the full pipeline execution.
+
+It will:  
+- Verify folder structure  
+- Run each processor step-by-step  
+- Run pipeline steps
+- Log progress and performance  
+- Save final versioned dataset to `data/output/`
+
 ## Output
 
-The final dataset is saved to:
-
-- `data/output/dataset.csv` – latest result  
+**Location**: data/output/dataset.csv
 
 **Output Variables**:
 
@@ -210,5 +193,6 @@ The final dataset is saved to:
 - **Respiratory_Diseases_Total**: Total respiratory-related deaths  
 - **Life_Expectancy**: Average life expectancy  
 - **GDP_per_capita**: GDP per capita
-
+- **Population** Size population of province 
+- **respiratory_deaths_per_100k** Respiratory deaths per 100,000 inhabitants
 ---
