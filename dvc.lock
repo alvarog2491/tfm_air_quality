@@ -5,10 +5,10 @@ stages:
       src/featuring/data/output/dataset.csv data/processed_training_data.csv 
       data/processed_test_data.csv
     deps:
-    - path: src/featuring/data/output/dataset.csv
+    - path: src/feature_pipeline/data/output/dataset.csv
       hash: md5
-      md5: 43c920c0ec403b07456c7fd1b7b381e0
-      size: 4124796
+      md5: 735100b77a1216a1f5f8a0a3f45acb19
+      size: 4442462
     - path: src/modeling/preprocess.py
       hash: md5
       md5: bc18654c506a0a670f16c94ad5e0d227
