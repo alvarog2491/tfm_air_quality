@@ -1,9 +1,12 @@
 import logging
 from pathlib import Path
 from typing import Optional
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from common.utils import file_utils
+
 
 class DatasetCleaner:
     """
@@ -62,29 +65,38 @@ class DatasetCleaner:
             if null_percentage == 0:
                 self.logger.info(f"No null values found in '{column}'")
             elif null_percentage < 0.05:
-                self.logger.info(f"Removing rows with nulls in '{column}' ({null_percentage:.2f}% of dataset)")
+                self.logger.info(
+                    f"Removing rows with nulls in '{column}' ({null_percentage:.2f}% of dataset)"
+                )
                 self._dataset = self._dataset.dropna(subset=[column])
             else:
-                self.logger.warning(f"Nulls in '{column}' exceed 5% ({null_percentage:.2f}%), keeping them.")
-
+                self.logger.warning(
+                    f"Nulls in '{column}' exceed 5% ({null_percentage:.2f}%), keeping them."
+                )
 
     def _convert_invalid_province_to_nan(self):
         """
         Replace invalid values in the 'Province' column (e.g., 'nan', 'Desconocido', 'Error') with NaN.
         """
-        self._dataset.loc[self._dataset['Province'].isin(['nan', 'Desconocido', 'Error']), 'Province'] = np.nan
-
+        self._dataset.loc[
+            self._dataset["Province"].isin(["nan", "Desconocido", "Error"]), "Province"
+        ] = np.nan
 
     def _remove_island_observations(self):
         """
         Removes all observations from island provinces.
         """
-        island_provinces = ['Santa Cruz de Tenerife', 'Las Palmas', 'Illes Balears', 'Ceuta', 'Melilla']
+        island_provinces = [
+            "Santa Cruz de Tenerife",
+            "Las Palmas",
+            "Illes Balears",
+            "Ceuta",
+            "Melilla",
+        ]
         initial_count = len(self._dataset)
-        self._dataset = self._dataset[~self._dataset['Province'].isin(island_provinces)]
+        self._dataset = self._dataset[~self._dataset["Province"].isin(island_provinces)]
         removed_count = initial_count - len(self._dataset)
         self.logger.info(f"Removed {removed_count} island observations")
-
 
     def _filter_timeframe(self):
         """
@@ -93,26 +105,27 @@ class DatasetCleaner:
         initial_count = len(self._dataset)
 
         # Ensure comparison works for both datetime and integer types
-        if pd.api.types.is_datetime64_any_dtype(self._dataset['Year']):
-            mask = self._dataset['Year'].dt.year.between(2000, 2021)
+        if pd.api.types.is_datetime64_any_dtype(self._dataset["Year"]):
+            mask = self._dataset["Year"].dt.year.between(2000, 2021)
         else:
-            mask = self._dataset['Year'].between(2000, 2021)
+            mask = self._dataset["Year"].between(2000, 2021)
 
         self._dataset = self._dataset[mask]
         removed_count = initial_count - len(self._dataset)
-        self.logger.info(f"Removed {removed_count} observations outside the 2000-2021 timeframe")
+        self.logger.info(
+            f"Removed {removed_count} observations outside the 2000-2021 timeframe"
+        )
 
     def _convert_to_appropriate_dtypes(self):
         """
         Converts columns to appropriate data types.
         """
-        json_path = Path(__file__).parent.parent / 'config' / 'feature_types.json'
+        json_path = Path(__file__).parent.parent / "config" / "feature_types.json"
         dtypes = file_utils.load_json_file(json_path)
 
         for column, dtype in dtypes.items():
             if column in self._dataset.columns:
                 self._dataset[column] = self._dataset[column].astype(dtype)
-            
 
     def clean_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """

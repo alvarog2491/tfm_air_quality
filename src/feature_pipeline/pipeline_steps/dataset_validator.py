@@ -1,8 +1,10 @@
 import logging
-import pandas as pd
 from pathlib import Path
-from typing import Dict
+
+import pandas as pd
+
 from common.utils import file_utils
+
 
 class DatasetValidator:
     """
@@ -59,7 +61,7 @@ class DatasetValidator:
             ValueError: If any column has an unexpected data type.
         """
         # Load data types from JSON config
-        json_path = Path(__file__).parent.parent / 'config' / 'feature_types.json'
+        json_path = Path(__file__).parent.parent / "config" / "feature_types.json"
         expected_dtypes = file_utils.load_json_file(json_path)
 
         for column, expected_dtype in expected_dtypes.items():
