@@ -62,12 +62,12 @@ class DataMerger:
                 merged_df,
                 province_population_df,
                 left_on=['Province', 'Year'],
-                right_on=['Province', 'Periodo'],
+                right_on=['Province', 'Year'],
                 how='left'
             )
 
             # Clean up duplicate columns
-            merged_df.drop(columns=['Periodo', 'anio', 'Sexo', 'Periodo_x', 'Periodo_y'], inplace=True, errors='ignore')
+            merged_df.drop(columns=['Periodo', 'anio'], inplace=True, errors='ignore')
             return merged_df
             
         except Exception as e:
@@ -108,7 +108,7 @@ class DataMerger:
             raise ValueError(f"GDP DataFrame missing columns: {missing_gdp_cols}")
         
         # Check province population columns
-        required_province_population_cols = ['Province', 'Periodo']
+        required_province_population_cols = ['Province', 'Year']
         missing_province_pop_cols = [col for col in required_province_population_cols if col not in province_population_df.columns]
         if missing_province_pop_cols:
             raise ValueError(f"Province population size DataFrame missing columns: {missing_province_pop_cols}")

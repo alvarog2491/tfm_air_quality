@@ -148,9 +148,12 @@ class SocioeconomicProcessor(BaseProcessor):
         self.logger.info("Transforming province population DataFrame")
 
         # Rename columns for consistency and apply data type conversions
-        self._province_population_df.rename(columns={'Total': 'Population'}, inplace=True)
+        self._province_population_df.rename(columns={'Total': 'Population', 'Periodo': 'Year'}, inplace=True)
         self._province_population_df['Population'] = self._province_population_df['Population'].str.replace('.', '', regex=False).astype(int)
         
+        # Drop unnecessary columns
+        self._province_population_df.drop(columns=['Sexo'], inplace=True)
+
         # Clean province names by removing numeric codes and extra spaces
         if 'Provincias' in self._province_population_df.columns:
             self._province_population_df['Provincias'] = self._province_population_df['Provincias'].str.replace(r'[0-9\s]+', '', regex=True)
