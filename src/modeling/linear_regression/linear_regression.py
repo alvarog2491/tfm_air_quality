@@ -1,13 +1,11 @@
-from sklearn.linear_model import LinearRegression
 from base_model import BaseModel
+from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+
 
 class LinearRegressionModel(BaseModel):
     def __init__(self):
-        self.pipeline = Pipeline([
-            ('regressor', LinearRegression())
-        ])
+        self.pipeline = Pipeline([("regressor", LinearRegression())])
 
     def train(self, X_train, y_train):
         self.pipeline.fit(X_train, y_train)
@@ -17,6 +15,7 @@ class LinearRegressionModel(BaseModel):
 
     def evaluate(self, X_test, y_test):
         from sklearn.metrics import mean_squared_error, r2_score
+
         predictions = self.predict(X_test)
         mse = mean_squared_error(y_test, predictions)
         r2 = r2_score(y_test, predictions)

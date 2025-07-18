@@ -1,10 +1,9 @@
 import pytest
 import pandas as pd
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, MagicMock
 import tempfile
 import os
-from pathlib import Path
-from  src.modeling.preprocess import main
+from src.modeling.preprocess import main
 
 
 @pytest.fixture
@@ -12,7 +11,7 @@ def mock_config():
     """Mock configuration data for testing preprocessing parameters"""
     return {
         "preprocess": {
-            "drop_colnames": ["id", "timestamp"],
+            "drop_colnames": ["id", "timestamp"],ƒ
             "categorical_features": ["category", "type"],
             "numerical_features": ["value1", "value2", "value3"],
             "validation_size": 0.2,

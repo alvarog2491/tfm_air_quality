@@ -1,14 +1,15 @@
+import argparse
 import json
 
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from common.utils.file_utils import load_yaml_config
-from common.utils.data_utils import prepare_features_and_target
 import joblib
-import argparse
 from config.logger import setup_logger
+from sklearn.model_selection import train_test_split
+
+from common.utils.data_utils import prepare_features_and_target
+from common.utils.file_utils import load_yaml_config
 
 logger = setup_logger(stage="TRAIN")
+
 
 def main(config_file: str, processed_dataset: str, output_model: str):
     # Load configuration
@@ -19,10 +20,12 @@ def main(config_file: str, processed_dataset: str, output_model: str):
     shuffle_random_state = config["shuffle_random_state"]
     random_state = config["train_test_split"]["random_state"]
     test_size = config["train_test_split"]["test_size"]
-    
+
     # Load and split the dataset
     logger.info("Loading and splitting the dataset...")
-    X, y = prepare_features_and_target(processed_dataset, target_column, shuffle, shuffle_random_state)
+    X, y = prepare_features_and_target(
+        processed_dataset, target_column, shuffle, shuffle_random_state
+    )
 
     # Split the dataset
     X_train, X_test, y_train, y_test = train_test_split(
@@ -36,6 +39,7 @@ def main(config_file: str, processed_dataset: str, output_model: str):
     logger.info("Training and evaluating the model...")
     if model_type == "linear_regression":
         from linear_regression.linear_regression import LinearRegressionModel
+
         model = LinearRegressionModel()
         model.train(X_train, y_train)
 
@@ -45,10 +49,9 @@ def main(config_file: str, processed_dataset: str, output_model: str):
     logger.info(json.dumps(metrics, indent=2))
     logger.info("======================================================")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Train the air quality model"
-    )
+    parser = argparse.ArgumentParser(description="Train the air quality model")
     parser.add_argument(
         "config_file",
         type=str,
@@ -66,10 +69,10 @@ if __name__ == "__main__":
         type=str,
         help="Output model file path",
         default="models/linear_regression_model.pkl",
-    )       
+    )
     args = parser.parse_args()
     main(
         config_file=args.config_file,
         processed_dataset=args.input_dataset,
-        output_model=args.output_model
+        output_model=args.output_model,
     )
