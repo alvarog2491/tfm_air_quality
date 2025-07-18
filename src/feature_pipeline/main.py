@@ -99,6 +99,11 @@ def run_data_processing():
         cleaner = DatasetCleaner()
         final_df = cleaner.clean_dataset(merged_df)
 
+        # Step 6: Validate final dataset
+        logging.info("============ Validating final dataset ============")
+        from pipeline_steps.dataset_validator import DatasetValidator
+        DatasetValidator.validate_all(final_df)
+
         # Save final result
         logging.info("============ Save final dataframe ============")
         data_dir = Path(__file__).resolve().parent / "data" 

@@ -155,7 +155,7 @@ class SocioeconomicProcessor(BaseProcessor):
         if 'Provincias' in self._province_population_df.columns:
             self._province_population_df['Provincias'] = self._province_population_df['Provincias'].str.replace(r'[0-9\s]+', '', regex=True)
             self._province_population_df.rename(columns={'Provincias': 'Province'}, inplace=True)
-            self.logger.info(f"Removed numeric codes on province names in Province population dataset")
+            self.logger.info(f"Removed numeric codes on province names")
 
     def map_province_names(self) -> None:
         """

@@ -5,11 +5,13 @@
     "Coruña,A",
     "Coruña (A)",
     "Coruña_A",
-    "A Coruña"
+    "A Coruña",
+    "Coru�a,A"
   ],
   "Albacete": [],
   "Almeria": [
-    "Almería"
+    "Almería",
+    "Almer�a"
   ],
   "Alicante/Alacant": [
     "Alacant / Alicante",
@@ -17,14 +19,16 @@
   ],
   "Araba/Alava": [
     "Álava",
-    "Araba/Álava"
+    "Araba/Álava",
+    "Araba/�lava"
   ],
   "Asturias": [
     "ASTURIAS, PRINCIPADO DE",
     "Asturias / Asturies"
   ],
   "Avila": [
-    "Ávila"
+    "Ávila",
+    "�vila"
   ],
   "Badajoz": [],
   "Barcelona": [],
@@ -33,7 +37,8 @@
   ],
   "Burgos": [],
   "Cadiz": [
-    "Cádiz"
+    "Cádiz",
+    "C�diz"
   ],
   "Cantabria": [
     "CANTABRIA",
@@ -42,7 +47,8 @@
   "Castellon/Castello": [
     "Castelló / Castellón",
     "Castellón",
-    "Castellón/Castelló"
+    "Castellón/Castelló",
+    "Castell�n/Castell�"
   ],
   "Ceuta": [
     "CEUTA"
@@ -52,11 +58,13 @@
     "Ciudad_Real"
   ],
   "Cordoba": [
-    "Córdoba"
+    "Córdoba",
+    "C�rdoba"
   ],
   "Cuenca": [],
   "Caceres": [
-    "Cáceres"
+    "Cáceres",
+    "C�ceres"
   ],
   "Girona": [],
   "Gipuzkoa": [
@@ -74,7 +82,8 @@
     "Balears"
   ],
   "Jaen": [
-    "Jaén"
+    "Jaén",
+    "Ja�n"
   ],
   "La Rioja": [
     "Logroño",
@@ -88,7 +97,8 @@
     "Las_Palmas"
   ],
   "Leon": [
-    "León"
+    "León",
+    "Le�n"
   ],
   "Lleida": [],
   "Lugo": [],
@@ -109,7 +119,8 @@
     "MELILLA"
   ],
   "Malaga": [
-    "Málaga"
+    "Málaga",
+    "M�laga"
   ],
   "Murcia": [
     "MURCIA, REGIÓN DE",
@@ -142,7 +153,8 @@
   "Valencia": [
     "València / Valencia",
     "Valencia",
-    "Valencia/València"
+    "Valencia/València",
+    "Valencia/Val�ncia"
   ],
   "Valladolid": [],
   "Zamora": [],

@@ -3,6 +3,7 @@ from pathlib import Path
 import logging
 from typing import Dict, List, Set
 import pandas as pd
+from common.utils import file_utils
 
 class ProvinceMapper:
     """
@@ -12,7 +13,7 @@ class ProvinceMapper:
     The JSON must contain exactly 52 official Spanish provinces, each with a list of accepted name variants.
     """
 
-    logger = logging.getLogger("ProvinceMapper")
+    logger = logging.getLogger(__name__)
     unified_province_dict: Dict[str, List[str]] = None
 
     @staticmethod
@@ -29,11 +30,7 @@ class ProvinceMapper:
         """
         if ProvinceMapper.unified_province_dict is None:
             json_path = Path(__file__).parent / 'unified_province_name.json'
-            if not json_path.is_file():
-                raise FileNotFoundError(f"Expected file not found: {json_path}")
-            
-            with open(json_path, "r", encoding="utf-8") as f:
-                ProvinceMapper.unified_province_dict = json.load(f)
+            ProvinceMapper.unified_province_dict = file_utils.load_json_file(json_path)
             
             num_provinces = len(ProvinceMapper.unified_province_dict.keys())
             if num_provinces != 52:

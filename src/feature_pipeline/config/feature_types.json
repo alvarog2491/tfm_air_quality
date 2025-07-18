@@ -1,0 +1,20 @@
+{
+    "Air Pollutant": "category",
+    "Air Pollutant Description": "category",
+    "Data Aggregation Process": "category",
+    "Year": "datetime64[ns]",
+    "Air Pollution Level": "float64",
+    "Unit Of Air Pollution Level": "category",
+    "Air Quality Station Type": "category",
+    "Air Quality Station Area": "category",
+    "Longitude": "float64",
+    "Latitude": "float64",
+    "Altitude": "float64",
+    "Province": "category",
+    "Quality": "category",
+    "Respiratory_diseases_total": "int64",
+    "Life_expectancy_total": "float64",
+    "pib": "float64",
+    "Population": "int64",
+    "respiratory_deaths_per_100k": "float64"
+}

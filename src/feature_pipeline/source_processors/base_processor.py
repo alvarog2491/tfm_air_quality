@@ -122,7 +122,9 @@ class BaseProcessor(ABC):
             df.to_csv(
                 processed_file_path, 
                 index=False,
-                float_format='%.3f' 
+                float_format='%.3f',
+                decimal=",", 
+                sep=";"
             )
             
             # Log save success with file info

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 import pandas as pd
 import numpy as np
+from common.utils import file_utils
 
 class DatasetCleaner:
     """
@@ -101,6 +102,18 @@ class DatasetCleaner:
         removed_count = initial_count - len(self._dataset)
         self.logger.info(f"Removed {removed_count} observations outside the 2000-2021 timeframe")
 
+    def _convert_to_appropriate_dtypes(self):
+        """
+        Converts columns to appropriate data types.
+        """
+        json_path = Path(__file__).parent.parent / 'config' / 'feature_types.json'
+        dtypes = file_utils.load_json_file(json_path)
+
+        for column, dtype in dtypes.items():
+            if column in self._dataset.columns:
+                self._dataset[column] = self._dataset[column].astype(dtype)
+            
+
     def clean_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """
         Main method to clean the dataset by applying all cleaning steps.
@@ -113,9 +126,11 @@ class DatasetCleaner:
         self.logger.info("Starting dataset cleaning process")
         self._dataset = dataset.copy()
 
+        # Clean operations
         self._remove_island_observations()
         self._filter_timeframe()
         self._handle_null_values()
-        
+        self._convert_to_appropriate_dtypes()
+
         self.logger.info("Dataset cleaning process completed")
         return self._dataset

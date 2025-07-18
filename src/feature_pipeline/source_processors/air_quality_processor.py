@@ -48,21 +48,21 @@ class AirQualityProcessor(BaseProcessor):
     Handles the processing of air quality data from CSV files, including loading, classification, and province normalization.
     """
 
-    # Define column data types as class constant for reusability
-    _COLUMN_DTYPES: Dict[str, str] = {
-        'Air Pollutant': 'category',
-        'Air Pollutant Description': 'category',
-        'Data Aggregation Process': 'category',
-        'Year': 'Int64',
-        'Air Pollution Level': 'float64',
-        'Unit Of Air Pollution Level': 'category',
-        'Air Quality Station Type': 'category',
-        'Air Quality Station Area': 'category',
-        'Altitude': 'float64',
-        'Longitude':'float64',
-        'Latitude':'float64',
-        'Province': 'category',
-    }
+    # Define columns to use for loading
+    _COLS_TO_USE: list[str] = [
+        'Air Pollutant',
+        'Air Pollutant Description',
+        'Data Aggregation Process',
+        'Year',
+        'Air Pollution Level',
+        'Unit Of Air Pollution Level',
+        'Air Quality Station Type',
+        'Air Quality Station Area',
+        'Altitude',
+        'Longitude',
+        'Latitude',
+        'Province',
+    ]
 
     def __init__(self, data_folder: Optional[Path] = None):
         """
@@ -100,11 +100,10 @@ class AirQualityProcessor(BaseProcessor):
             raise FileNotFoundError(f"Required file not found: {file_path}")
         
         try:
-            # Load with optimized data types and specific columns only
+            # Load with specific columns only
             self._air_quality_df = pd.read_csv(
                 file_path, 
-                usecols=self._COLUMN_DTYPES.keys(), 
-                dtype=self._COLUMN_DTYPES,
+                usecols=self._COLS_TO_USE, 
                 parse_dates=['Year']
             )
             self._validate_dataframe_not_empty(self._air_quality_df, file_path)
@@ -133,6 +132,7 @@ class AirQualityProcessor(BaseProcessor):
         # Normalize pollutant names for consistent matching
         self._air_quality_df['Air Pollutant'] = self._air_quality_df['Air Pollutant'].str.lower()
 
+        # Perform quality classification
         def get_quality(row):
             """Get quality classification for a single row based on pollutant type and level."""
             pollutant = row['Air Pollutant']

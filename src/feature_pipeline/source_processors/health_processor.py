@@ -49,7 +49,8 @@ class HealthProcessor(BaseProcessor):
     _COLUMN_DTYPES: Dict[str, str] = {
         'Causa de muerte': 'category',
         'Sexo': 'category',
-        'Provincias': 'category'
+        'Provincias': 'category',
+        'Total': 'float64',
     }
 
     def __init__(self, data_folder: Optional[Path] = None):
@@ -110,11 +111,19 @@ class HealthProcessor(BaseProcessor):
             # Load CSV files with appropriate settings for Spanish data
             self._respiratory_diseases_df = pd.read_csv(
                 respiratory_file,
-                dtype=self._COLUMN_DTYPES,
                 parse_dates=['Periodo'],
-                sep=';', 
-                encoding='latin1'
+                decimal=',', 
+                sep=';'
             )
+
+            self._respiratory_diseases_df['Total'] = (
+                self._respiratory_diseases_df['Total']
+                .astype(str)
+                .str.replace(',', '.', regex=False)
+                .str.replace('.', '', regex=False) 
+                .astype(int)
+            )
+
             self._life_expectancy_df = pd.read_csv(
                 life_expectancy_file,
                 dtype=self._COLUMN_DTYPES,
@@ -153,6 +162,7 @@ class HealthProcessor(BaseProcessor):
         # Clean province names by removing numeric codes and extra spaces
         for df_name, df in [("respiratory_diseases", self._respiratory_diseases_df), 
                            ("life_expectancy", self._life_expectancy_df)]:
+            
             if 'Provincias' in df.columns:
                 df['Provincias'] = df['Provincias'].str.replace(r'[0-9\s]+', '', regex=True)
                 df.rename(columns={'Provincias': 'Province'}, inplace=True)
@@ -182,7 +192,7 @@ class HealthProcessor(BaseProcessor):
                 respiratory_df,
                 life_expectancy_df,
                 on=['Province', 'Periodo'],
-                how='outer',  # Use outer join to keep all data
+                how='outer',
                 suffixes=('_respiratory', '_life_exp')
             )
 
