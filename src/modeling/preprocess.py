@@ -1,6 +1,6 @@
 import argparse
 
-from common.utils.data_utils import (
+from common.utils.dataframe_utils import (
     load_raw_dataset,
     one_hot_encode_categorical_features,
     scale_numerical_features,
