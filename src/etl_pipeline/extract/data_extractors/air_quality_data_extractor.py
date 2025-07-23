@@ -68,9 +68,7 @@ class AirQualityDataExtractor(BaseExtractor):
             raise FileNotFoundError(f"Required file not found: {file_path}")
 
         try:
-            df: pd.DataFrame = pd.read_csv(
-                file_path, usecols=self._COLS_TO_USE, parse_dates=["Year"]
-            )
+            df: pd.DataFrame = pd.read_csv(file_path, usecols=self._COLS_TO_USE, parse_dates=["Year"])  # type: ignore
             self._log_dataframe_info(df)
             return df
         except Exception as e:

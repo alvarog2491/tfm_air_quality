@@ -61,9 +61,9 @@ class SocioeconomicDataExtractor(BaseExtractor):
             raise FileNotFoundError(f"Required file not found: {population_file}")
 
         try:
-            gdp_df = pd.read_csv(pib_file, sep=";", decimal=",", encoding="ISO-8859-1")
+            gdp_df = pd.read_csv(pib_file, sep=";", decimal=",", encoding="ISO-8859-1")  # type: ignore
 
-            population_df = pd.read_csv(
+            population_df = pd.read_csv(  # type: ignore
                 population_file,
                 parse_dates=["Periodo"],
                 sep=";",

@@ -65,14 +65,14 @@ class HealthDataExtractor(BaseExtractor):
             raise FileNotFoundError(f"Required file not found: {life_expectancy_file}")
 
         try:
-            respiratory_df = pd.read_csv(
+            respiratory_df = pd.read_csv(  # type: ignore
                 respiratory_file,
                 parse_dates=["Periodo"],
                 decimal=",",
                 sep=";",
             )
 
-            life_expectancy_df = pd.read_csv(
+            life_expectancy_df = pd.read_csv(  # type: ignore
                 life_expectancy_file,
                 parse_dates=["Periodo"],
                 decimal=",",

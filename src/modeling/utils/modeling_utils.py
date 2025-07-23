@@ -1,9 +1,17 @@
+from typing import Dict, List, Optional, Tuple
+
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+from common.utils.dataframe_utils import load_raw_dataset
+
+
 def prepare_features_and_target(
     filepath: str,
     target_column: str,
     shuffle: bool,
     shuffle_random_state: int,
-    var_dtypes: dict = None,
+    var_dtypes: Dict[str, str] = {},
 ) -> Tuple[pd.DataFrame, pd.Series]:
     """
     Load dataset from CSV, optionally shuffle it, and split into features and target.
@@ -47,7 +55,9 @@ def one_hot_encode_categorical_features(
 
 
 def scale_numerical_features(
-    df: pd.DataFrame, numerical_features: List[str], scaler=None
+    df: pd.DataFrame,
+    numerical_features: List[str],
+    scaler: Optional[StandardScaler] = None,
 ) -> Tuple[pd.DataFrame, StandardScaler]:
     """
     Scales the data to a normal distribution
@@ -63,11 +73,11 @@ def scale_numerical_features(
     # Scale and fit with zero mean and unit variance
     if scaler is None:
         scaler = StandardScaler()
-        df[numerical_features] = scaler.fit_transform(df[numerical_features])
+        df[numerical_features] = scaler.fit_transform(df[numerical_features])  # type: ignore
     else:
         df[numerical_features] = scaler.transform(df[numerical_features])
 
-    return df, scaler
+    return (df, scaler)
 
 
 def separate_train_evaluate_dataset(

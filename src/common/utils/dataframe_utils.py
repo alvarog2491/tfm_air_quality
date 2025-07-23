@@ -36,9 +36,7 @@ def load_raw_dataset(
                 f"Conflict detected: Columns {overlap} are present in both 'use_cols' and 'drop_columns'."
             )
 
-    df = pd.read_csv(
-        filepath, usecols=use_cols, dtype=var_dtypes, parse_dates=parse_dates
-    )
+    df = pd.read_csv(filepath, usecols=use_cols, dtype=var_dtypes, parse_dates=parse_dates)  # type: ignore
 
     if drop_columns:
         df = df.drop(columns=drop_columns, errors="ignore")

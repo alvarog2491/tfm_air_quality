@@ -1,9 +1,9 @@
 stages:
   preprocess:
-    cmd: python3 src/modeling/preprocess.py params.yaml src/featuring/data/output/dataset.csv data/processed_training_data.csv data/processed_test_data.csv
+    cmd: python3 src/modeling/preprocess.py params.yaml src/etl_pipeline/data/output/dataset.csv data/processed_training_data.csv data/processed_test_data.csv
     deps:
       - src/modeling/preprocess.py
-      - src/feature_pipeline/data/output/dataset.csv
+      - src/etl_pipeline/data/output/dataset.csv
     outs:
       - data/processed_training_data.csv
       - data/processed_test_data.csv
