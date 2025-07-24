@@ -44,9 +44,11 @@ class DataTransformationStep(ETLStep):
 
         # Health data transformation
         self.logger.info("Transforming health data...")
-        HealthDataTransformer().transform(
+        respiratory_diseases_df, life_expectancy_df = HealthDataTransformer().transform(
             dataframes["respiratory_diseases"], dataframes["life_expectancy"]
         )
+        dataframes["respiratory_diseases"] = respiratory_diseases_df
+        dataframes["life_expectancy"] = life_expectancy_df
 
         # Socioeconomic data transformation
         self.logger.info("Transforming socioeconomic data...")
