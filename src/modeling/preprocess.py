@@ -2,12 +2,15 @@ import argparse
 
 from common.utils.dataframe_utils import (
     load_raw_dataset,
+    validate_no_missing_values,
+)
+from modeling.utils.dataset_modeling_utils import (
     one_hot_encode_categorical_features,
     scale_numerical_features,
     separate_train_evaluate_dataset,
-    validate_no_missing_values,
 )
 from common.utils.file_utils import load_yaml_config
+
 from modeling.config.logger import setup_logger
 
 logger = setup_logger(stage="PREPROCESS")
@@ -25,7 +28,7 @@ def main(
     drop_colnames = config["drop_colnames"]
     categorical_columns = config["categorical_features"]
     numerical_columns = config["numerical_features"]
-    validation_size = config["validation_size"]
+    validation_size: float = config["validation_size"]
     var_dtypes = config["var_dtypes"]
 
     # Read dataset
@@ -41,8 +44,8 @@ def main(
 
     # Check for missing values
     logger.info("Checking for missing values...")
-    training_dataset = validate_no_missing_values(training_dataset)
-    evaluation_dataset = validate_no_missing_values(evaluation_dataset)
+    validate_no_missing_values(training_dataset)
+    validate_no_missing_values(evaluation_dataset)
 
     # One-hot encode categorical columns
     logger.info("One-hot encoding categorical columns...")

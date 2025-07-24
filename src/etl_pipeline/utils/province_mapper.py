@@ -16,7 +16,7 @@ class ProvinceMapper:
     """
 
     logger = logging.getLogger(__name__)
-    unified_province_dict: Dict[str, List[str]] = None
+    unified_province_dict: Dict[str, List[str]] = {}
 
     @staticmethod
     def _load_json_file() -> None:
@@ -30,15 +30,15 @@ class ProvinceMapper:
             FileNotFoundError: If the mapping file is not found.
             ValueError: If the mapping does not contain exactly 52 provinces.
         """
-        if ProvinceMapper.unified_province_dict is None:
-            json_path = Path(__file__).parent / "unified_province_name.json"
-            ProvinceMapper.unified_province_dict = file_utils.load_json_file(json_path)
 
-            num_provinces = len(ProvinceMapper.unified_province_dict.keys())
-            if num_provinces != 52:
-                raise ValueError(
-                    f"Expected 52 provinces in the dictionary, but found {num_provinces}."
-                )
+        json_path = Path(__file__).parent / "unified_province_name.json"
+        ProvinceMapper.unified_province_dict = file_utils.load_json_file(json_path)
+
+        num_provinces = len(ProvinceMapper.unified_province_dict.keys())
+        if num_provinces != 52:
+            raise ValueError(
+                f"Expected 52 provinces in the dictionary, but found {num_provinces}."
+            )
 
     @staticmethod
     def map_province_name(df: pd.DataFrame) -> None:
@@ -60,7 +60,7 @@ class ProvinceMapper:
             raise KeyError("Missing required column: 'Province'")
 
         ProvinceMapper._load_json_file()
-        ProvinceMapper.logger.info(f"Mapping province names...")
+        ProvinceMapper.logger.info("Mapping province names...")
 
         # Create flat mapping from all aliases to official names
         province_mapping: Dict[str, str] = {
@@ -70,7 +70,7 @@ class ProvinceMapper:
         }
 
         # Apply mapping and convert to category
-        df["Province"] = df["Province"].astype(str).replace(province_mapping)
+        df["Province"] = df["Province"].astype(str).replace(province_mapping)  # type: ignore
         df["Province"] = df["Province"].astype("category")
 
         ProvinceMapper._check_provinces(df)

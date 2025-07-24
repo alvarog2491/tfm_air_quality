@@ -2,15 +2,15 @@ import argparse
 import json
 from pathlib import Path
 
-from config.logger import setup_logger
+from modeling.config.logger import setup_logger
 
-from common.utils.data_utils import prepare_features_and_target
+from modeling.utils.dataset_modeling_utils import prepare_features_and_target
 from common.utils.file_utils import create_directory, load_pickle_file, load_yaml_config
 
 logger = setup_logger(stage="EVALUATE")
 
 
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, X_test, y_test) -> None:
     """
     Evaluate the model on the test set and return metrics.
     """

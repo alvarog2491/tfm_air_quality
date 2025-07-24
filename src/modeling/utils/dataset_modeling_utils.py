@@ -2,8 +2,10 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-
+import logging
 from common.utils.dataframe_utils import load_raw_dataset
+
+logger = logging.getLogger("Modeling Utils")
 
 
 def prepare_features_and_target(
@@ -34,6 +36,8 @@ def prepare_features_and_target(
 
     X = data.drop(columns=target_column)
     y = data[target_column]
+    logger.info(f"X Shape: {X.shape}")
+    logger.info(f"y Shape: {y.shape}")
     return X, y
 
 

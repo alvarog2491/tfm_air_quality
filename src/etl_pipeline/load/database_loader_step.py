@@ -2,9 +2,10 @@
 Database loading step for persisting data to databases.
 """
 
+from typing import Any, Dict
+
 import pandas as pd
-from pathlib import Path
-from typing import Optional, Dict, Any
+
 from etl_pipeline import ETLStep
 
 
@@ -24,7 +25,9 @@ class DatabaseLoaderStep(ETLStep):
         self.load_method = load_method  # 'replace', 'append', 'fail'
         self.chunk_size = chunk_size
 
-    def execute(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def execute(
+        self, dataframes: Dict[str, pd.DataFrame], context: Dict[str, Any]
+    ) -> None:
         """Load dataset into database."""
         self.log_start()
 

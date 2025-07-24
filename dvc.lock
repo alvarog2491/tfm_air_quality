@@ -2,26 +2,26 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: python3 src/modeling/preprocess.py params.yaml 
-      src/featuring/data/output/dataset.csv data/processed_training_data.csv 
+      src/etl_pipeline/data/output/dataset.csv data/processed_training_data.csv 
       data/processed_test_data.csv
     deps:
-    - path: src/feature_pipeline/data/output/dataset.csv
+    - path: src/etl_pipeline/data/output/dataset.csv
       hash: md5
-      md5: 735100b77a1216a1f5f8a0a3f45acb19
-      size: 4442462
+      md5: 2d1a88193645ec3d6500677c4d286145
+      size: 4392067
     - path: src/modeling/preprocess.py
       hash: md5
-      md5: bc18654c506a0a670f16c94ad5e0d227
-      size: 3546
+      md5: 48c184ebfd7892a38b4ff38a004d7234
+      size: 3445
     outs:
     - path: data/processed_test_data.csv
       hash: md5
-      md5: c808e2e9ad433edc03a6bf3163ca5685
-      size: 773003
+      md5: 40de1d34d51de179c6dbfee657716f4a
+      size: 894235
     - path: data/processed_training_data.csv
       hash: md5
-      md5: 8be3d0488190621e7dba0a969c161d97
-      size: 3094960
+      md5: 1453722b3c745590759a65c209229b32
+      size: 3580530
   train:
     cmd: python3 src/modeling/train.py params.yaml 
       data/processed_training_data.csv models/model.pkl

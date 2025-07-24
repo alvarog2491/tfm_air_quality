@@ -9,7 +9,7 @@ import yaml
 
 def load_yaml_config(
     yaml_path: Union[str, Path],
-) -> Dict[str, Union[str, List[str], Dict[str, Any]]]:
+) -> Dict[str, Any]:
     """
     Load a YAML configuration file from the specified path.
 

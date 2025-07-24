@@ -139,7 +139,7 @@ def main():
         if final_df.empty is not False:
             print("\nFinal dataset preview:")
             print(final_df.head())
-            print(f"\nDataset info:")
+            print("\nDataset info:")
             print(final_df.info())
 
         return final_df, results

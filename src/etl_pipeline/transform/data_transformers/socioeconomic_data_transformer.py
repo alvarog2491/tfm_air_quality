@@ -62,7 +62,7 @@ class SocioeconomicDataTransformer(BaseTransformer):
         """
         self.logger.info("Transforming GDP DataFrame from wide to long format")
 
-        gdp_df = gdp_df.melt(id_vars="Provincia", var_name="anio")
+        gdp_df = gdp_df.melt(id_vars="Provincia", var_name="anio")  # type: ignore
         gdp_df.rename(columns=self._GDP_COLUMNS_MAPPER, inplace=True)
         gdp_df["Year"] = pd.to_datetime(gdp_df["Year"], format="%Y")
         gdp_df["pib"] = gdp_df["pib"].astype(float)

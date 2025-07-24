@@ -81,7 +81,7 @@ class AirQualityDataTransformer(BaseTransformer):
             value = row["Air Pollution Level"]
             if pollutant in quality_thresholds:
                 bins = quality_thresholds[pollutant]
-                label: Any = pd.cut([value], bins=bins, labels=quality_labels)[0]
+                label: Any = pd.cut([value], bins=bins, labels=quality_labels)[0]  # type: ignore
                 return str(label)
             return "UNKNOWN"
 
@@ -94,7 +94,7 @@ class AirQualityDataTransformer(BaseTransformer):
 
         quality_counts = air_quality_df["Quality"].value_counts()
         self.logger.info(
-            f"Air quality classification completed: {quality_counts.to_dict()}"
+            f"Air quality classification completed: {quality_counts.to_dict()}"  # type: ignore
         )
 
         unknown_count = quality_counts.get("UNKNOWN", 0)

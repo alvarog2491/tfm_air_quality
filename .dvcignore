@@ -3,5 +3,3 @@
 # https://dvc.org/doc/user-guide/dvcignore
 
 src/dataset_creator/data/output/dataset_*
-#!src/dataset_creator/data/output/dataset.csv
-#!src/dataset_creator/data/output/dataset.csv.dvc

@@ -3,9 +3,9 @@ common_drop_colnames: &common_drop_colnames
   - Air Pollutant
   - Air Pollutant Description
   - Data Aggregation Process
-  - Year
   - Unit Of Air Pollution Level
   - Province
+  - Year
 
 common_categorical_features: &common_categorical_features
   - Air Quality Station Type

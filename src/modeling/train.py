@@ -1,11 +1,11 @@
 import argparse
 import json
-
+from typing import Dict, Any
 import joblib
-from config.logger import setup_logger
+from modeling.config.logger import setup_logger
 from sklearn.model_selection import train_test_split
 
-from common.utils.data_utils import prepare_features_and_target
+from modeling.utils.dataset_modeling_utils import prepare_features_and_target
 from common.utils.file_utils import load_yaml_config
 
 logger = setup_logger(stage="TRAIN")
@@ -13,8 +13,8 @@ logger = setup_logger(stage="TRAIN")
 
 def main(config_file: str, processed_dataset: str, output_model: str):
     # Load configuration
-    config = load_yaml_config(config_file)["train"]
-    model_type = config["model_type"]
+    config: Dict[str, Any] = load_yaml_config(config_file)["train"]
+    model_type: str = config["model_type"]
     target_column = config["target_column"]
     shuffle = config["shuffle"]
     shuffle_random_state = config["shuffle_random_state"]

@@ -69,7 +69,7 @@ class BaseTransformer(ABC):
             )
             return
 
-        mask = df[column].isin(invalid_values)
+        mask = df[column].isin(invalid_values)  # type: ignore
         num_replaced = mask.sum()
 
         if num_replaced > 0:
