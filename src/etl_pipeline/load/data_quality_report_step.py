@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import Any, Dict
 
 import pandas as pd
-from load.data_reporters import AirQualityDataReporter
+
+# from load.data_reporters import AirQualityDataReporter
 from pandas.core.indexes.base import Index
 
 from etl_pipeline import ETLStep
