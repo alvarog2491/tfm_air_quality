@@ -1,2 +1,4 @@
 /model.pkl
 /scaler.pkl
+/model_linear_regression.pkl
+/model_random_forest.pkl

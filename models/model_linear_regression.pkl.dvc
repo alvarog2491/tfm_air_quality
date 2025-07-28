@@ -1,0 +1,5 @@
+outs:
+- md5: c9b6e74877627b19fe2c075451a14bd6
+  size: 1924
+  hash: md5
+  path: model_linear_regression.pkl
