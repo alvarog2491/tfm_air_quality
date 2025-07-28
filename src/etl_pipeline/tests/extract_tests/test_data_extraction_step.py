@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 import pandas as pd
 from extract import DataExtractionStep
-from tests.conftest import initialize_test_data
+from etl_pipeline.tests.conftest import initialize_test_data
 
 
 def test_real_data_extraction_step(tmp_path: Path, mock_context: Dict[str, Any]):
