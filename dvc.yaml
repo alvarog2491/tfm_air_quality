@@ -4,6 +4,7 @@ stages:
     deps:
       - src/modeling/preprocess.py
       - src/etl_pipeline/data/output/dataset.csv
+      - params.yaml
     outs:
       - data/processed_training_data.csv
       - data/processed_test_data.csv
@@ -15,6 +16,7 @@ stages:
       - src/modeling/train.py
       - data/processed_training_data.csv
       - models/scaler.pkl
+      - params.yaml
     outs:
       - models/model.pkl
   
@@ -25,5 +27,6 @@ stages:
       - models/model.pkl
       - models/scaler.pkl
       - data/processed_test_data.csv
+      - params.yaml
     outs:
       - metrics/evaluation.json
