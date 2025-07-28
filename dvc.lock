@@ -3,7 +3,7 @@ stages:
   preprocess:
     cmd: python3 src/modeling/preprocess.py params.yaml 
       src/etl_pipeline/data/output/dataset.csv data/processed_training_data.csv 
-      data/processed_test_data.csv
+      data/processed_test_data.csv --scaler_output models/scaler.pkl
     deps:
     - path: src/etl_pipeline/data/output/dataset.csv
       hash: md5
@@ -11,8 +11,8 @@ stages:
       size: 4392067
     - path: src/modeling/preprocess.py
       hash: md5
-      md5: 25d779f53ca3da2ac6a3897f851c9a46
-      size: 3446
+      md5: 7c77d3a04379f8dfd6408cb5ebc7feff
+      size: 4760
     outs:
     - path: data/processed_test_data.csv
       hash: md5
@@ -22,26 +22,36 @@ stages:
       hash: md5
       md5: 2deaeda7870161c5f88991f4f6b27fac
       size: 3356499
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 10eb873ab8d83564dc13b548f4d37036
+      size: 975
   train:
     cmd: python3 src/modeling/train.py params.yaml 
-      data/processed_training_data.csv models/model.pkl
+      data/processed_training_data.csv models/model.pkl --scaler_path 
+      models/scaler.pkl
     deps:
     - path: data/processed_training_data.csv
       hash: md5
       md5: 2deaeda7870161c5f88991f4f6b27fac
       size: 3356499
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 10eb873ab8d83564dc13b548f4d37036
+      size: 975
     - path: src/modeling/train.py
       hash: md5
-      md5: c1008e7843e1060b99a236a56dcb98db
-      size: 2650
+      md5: b375f0f91289f776ac1c0ee00282df1b
+      size: 4405
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: 6155479f4a7ec185e6809e8ee1c6206b
-      size: 1764
+      md5: 1022849156efc986cb572c6ada46cc23
+      size: 1908
   evaluate:
     cmd: python3 src/modeling/evaluate.py params.yaml models/model.pkl 
-      data/processed_test_data.csv metrics/evaluation.json
+      data/processed_test_data.csv metrics/evaluation.json --scaler_path 
+      models/scaler.pkl
     deps:
     - path: data/processed_test_data.csv
       hash: md5
@@ -49,14 +59,18 @@ stages:
       size: 838229
     - path: models/model.pkl
       hash: md5
-      md5: 6155479f4a7ec185e6809e8ee1c6206b
-      size: 1764
+      md5: 1022849156efc986cb572c6ada46cc23
+      size: 1908
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 10eb873ab8d83564dc13b548f4d37036
+      size: 975
     - path: src/modeling/evaluate.py
       hash: md5
-      md5: e14d4523eb39702d57a023a9341326da
-      size: 2805
+      md5: 8c2c265ef364b21c8db8101bafddbca8
+      size: 4080
     outs:
     - path: metrics/evaluation.json
       hash: md5
-      md5: 72325279461360f4c46182e1f445ae12
-      size: 58
+      md5: 2146a11f3962895209b8a9e45ef89314
+      size: 116

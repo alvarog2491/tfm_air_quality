@@ -1,26 +1,29 @@
 stages:
   preprocess:
-    cmd: python3 src/modeling/preprocess.py params.yaml src/etl_pipeline/data/output/dataset.csv data/processed_training_data.csv data/processed_test_data.csv
+    cmd: python3 src/modeling/preprocess.py params.yaml src/etl_pipeline/data/output/dataset.csv data/processed_training_data.csv data/processed_test_data.csv --scaler_output models/scaler.pkl
     deps:
       - src/modeling/preprocess.py
       - src/etl_pipeline/data/output/dataset.csv
     outs:
       - data/processed_training_data.csv
       - data/processed_test_data.csv
+      - models/scaler.pkl
 
   train:
-    cmd: python3 src/modeling/train.py params.yaml data/processed_training_data.csv models/model.pkl
+    cmd: python3 src/modeling/train.py params.yaml data/processed_training_data.csv models/model.pkl --scaler_path models/scaler.pkl
     deps:
       - src/modeling/train.py
       - data/processed_training_data.csv
+      - models/scaler.pkl
     outs:
       - models/model.pkl
   
   evaluate:
-    cmd: python3 src/modeling/evaluate.py params.yaml models/model.pkl data/processed_test_data.csv metrics/evaluation.json
+    cmd: python3 src/modeling/evaluate.py params.yaml models/model.pkl data/processed_test_data.csv metrics/evaluation.json --scaler_path models/scaler.pkl
     deps:
       - src/modeling/evaluate.py
       - models/model.pkl
+      - models/scaler.pkl
       - data/processed_test_data.csv
     outs:
       - metrics/evaluation.json

@@ -3,6 +3,9 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+# Import ValidationError from file_utils to maintain consistency
+from .file_utils import ValidationError
+
 
 def load_raw_dataset(
     filepath: str,
@@ -172,3 +175,83 @@ def log_memory_usage(df: pd.DataFrame) -> None:
     """
     memory_usage = df.memory_usage(deep=True).sum() / 1024**2
     logging.info(f"(~{memory_usage:.1f} MB memory usage)")
+
+
+def validate_dataframe_columns(df: pd.DataFrame, required_columns: List[str], 
+                              df_name: str = "DataFrame") -> None:
+    """
+    Validate that a DataFrame contains required columns.
+    
+    Args:
+        df: DataFrame to validate
+        required_columns: List of required column names
+        df_name: Name of the DataFrame for error messages
+        
+    Raises:
+        ValidationError: If required columns are missing
+    """
+    missing_columns = set(required_columns) - set(df.columns)
+    if missing_columns:
+        raise ValidationError(
+            f"{df_name} missing required columns: {sorted(missing_columns)}. "
+            f"Available columns: {sorted(df.columns)}"
+        )
+
+
+def validate_dataframe_not_empty(df: pd.DataFrame, df_name: str = "DataFrame") -> None:
+    """
+    Validate that a DataFrame is not empty.
+    
+    Args:
+        df: DataFrame to validate
+        df_name: Name of the DataFrame for error messages
+        
+    Raises:
+        ValidationError: If DataFrame is empty
+    """
+    if df.empty:
+        raise ValidationError(f"{df_name} is empty")
+    if len(df) == 0:
+        raise ValidationError(f"{df_name} has no rows")
+
+
+def validate_data_shapes_match(X: pd.DataFrame, y: pd.Series) -> None:
+    """
+    Validate that features and target have matching number of samples.
+    
+    Args:
+        X: Features DataFrame
+        y: Target Series
+        
+    Raises:
+        ValidationError: If shapes don't match
+    """
+    if len(X) != len(y):
+        raise ValidationError(
+            f"Features and target have different number of samples: "
+            f"X has {len(X)} samples, y has {len(y)} samples"
+        )
+
+
+def validate_target_column(df: pd.DataFrame, target_column: str) -> None:
+    """
+    Validate that target column exists and has valid values.
+    
+    Args:
+        df: DataFrame containing the target column
+        target_column: Name of the target column
+        
+    Raises:
+        ValidationError: If target column is invalid
+    """
+    validate_dataframe_columns(df, [target_column], "Dataset")
+    
+    target_series = df[target_column]
+    if target_series.isna().all():
+        raise ValidationError(f"Target column '{target_column}' contains only null values")
+    
+    null_percentage = target_series.isna().sum() / len(target_series) * 100
+    if null_percentage > 50:
+        raise ValidationError(
+            f"Target column '{target_column}' has {null_percentage:.1f}% null values (too high)"
+        )

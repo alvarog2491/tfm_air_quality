@@ -1,19 +1,17 @@
 from base_model import BaseModel
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from typing import Dict, Any
 
 
-class LinearRegressionModel(BaseModel):
+class RandomForestModel(BaseModel):
     def __init__(self, metrics_config: Dict[str, Any] = None, hyperparameters: Dict[str, Any] = None):
         super().__init__(metrics_config, hyperparameters)
         
-        # Apply hyperparameters to LinearRegression
-        lr_params = self.hyperparameters.copy()
-        # Remove any parameters that sklearn.LinearRegression doesn't accept
-        lr_params.pop('normalize', None)  # 'normalize' is deprecated in newer sklearn versions
+        # Apply hyperparameters to RandomForestRegressor
+        rf_params = self.hyperparameters.copy()
         
-        self.pipeline = Pipeline([("regressor", LinearRegression(**lr_params))])
+        self.pipeline = Pipeline([("regressor", RandomForestRegressor(**rf_params))])
 
     def train(self, X_train, y_train):
         self.pipeline.fit(X_train, y_train)

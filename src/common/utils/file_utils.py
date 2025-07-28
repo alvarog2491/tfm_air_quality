@@ -2,9 +2,12 @@ import json
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Union
+import logging
 
 import joblib
 import yaml
+
+logger = logging.getLogger("FileUtils")
 
 
 def load_yaml_config(
@@ -108,3 +111,56 @@ def save_pickle_file(data: Any, file_path: str) -> None:
     """
     create_directory(file_path)
     joblib.dump(data, file_path)
+
+
+class ValidationError(Exception):
+    """Custom exception for validation errors."""
+    pass
+
+
+def validate_file_exists(file_path: str, description: str = "File") -> Path:
+    """
+    Validate that a file exists.
+    
+    Args:
+        file_path: Path to the file
+        description: Description of the file for error messages
+        
+    Returns:
+        Path object if file exists
+        
+    Raises:
+        ValidationError: If file doesn't exist
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise ValidationError(f"{description} not found at: {file_path}")
+    if not path.is_file():
+        raise ValidationError(f"{description} path is not a file: {file_path}")
+    return path
+
+
+def validate_directory_exists(dir_path: str, create_if_missing: bool = False) -> Path:
+    """
+    Validate that a directory exists, optionally creating it.
+    
+    Args:
+        dir_path: Path to the directory
+        create_if_missing: Whether to create directory if it doesn't exist
+        
+    Returns:
+        Path object
+        
+    Raises:
+        ValidationError: If directory doesn't exist and create_if_missing is False
+    """
+    path = Path(dir_path)
+    if not path.exists():
+        if create_if_missing:
+            path.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Created directory: {path}")
+        else:
+            raise ValidationError(f"Directory not found: {dir_path}")
+    elif not path.is_dir():
+        raise ValidationError(f"Path is not a directory: {dir_path}")
+    return path

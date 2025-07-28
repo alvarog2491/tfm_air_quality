@@ -21,6 +21,9 @@ common_target: &common_target "Respiratory_diseases_total"
 common_shuffle: &common_shuffle false
 common_shuffle_random_state: &common_shuffle_random_state 1991
 
+common_metrics: &common_metrics
+  enabled_metrics: ["mse", "rmse", "mae", "r2"]
+
 common_dtypes: &common_dtypes
   Air Pollutant: "category"
   Air Pollutant Description: "category"
@@ -48,6 +51,20 @@ preprocess:
 train:
   model_type: linear_regression
   target_column: *common_target
+  metrics: *common_metrics
+  hyperparameters:
+    linear_regression:
+      fit_intercept: true
+      normalize: false
+      copy_X: true
+      n_jobs: null
+    random_forest:
+      n_estimators: 100
+      max_depth: null
+      min_samples_split: 2
+      min_samples_leaf: 1
+      random_state: 1991
+      n_jobs: -1
   train_test_split:
     test_size: 0.2
     random_state: 1991
@@ -57,6 +74,7 @@ train:
 evaluate:
   target_column: *common_target
   drop_colnames: *common_drop_colnames
+  metrics: *common_metrics
   var_dtypes: *common_dtypes
   shuffle: *common_shuffle
   shuffle_random_state: *common_shuffle_random_state

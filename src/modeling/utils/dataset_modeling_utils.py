@@ -5,7 +5,17 @@ from sklearn.preprocessing import StandardScaler
 import logging
 from common.utils.dataframe_utils import load_raw_dataset
 
-logger = logging.getLogger("Modeling Utils")
+# Use a simple logger without stage formatting to avoid conflicts
+logger = logging.getLogger("ModelingUtils")
+logger.setLevel(logging.INFO)
+
+# Only add handler if not already present
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.propagate = False
 
 
 def prepare_features_and_target(

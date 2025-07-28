@@ -5,7 +5,8 @@ from pathlib import Path
 from modeling.config.logger import setup_logger
 
 from modeling.utils.dataset_modeling_utils import prepare_features_and_target
-from common.utils.file_utils import create_directory, load_pickle_file, load_yaml_config
+from common.utils.file_utils import create_directory, load_pickle_file, load_yaml_config, validate_file_exists, ValidationError
+from common.utils.dataframe_utils import validate_data_shapes_match
 
 logger = setup_logger(stage="EVALUATE")
 
@@ -32,30 +33,56 @@ def main(
     model_file: str,
     evaluation_dataset: str,
     output_metrics: str,
+    scaler_path: str = None,
 ):
-    # Load configuration
-    logger.info("Loading configuration...")
-    config = load_yaml_config(config_file)["evaluate"]
-    target_column = config["target_column"]
-    shuffle = config["shuffle"]
-    shuffle_random_state = config["shuffle_random_state"]
-    var_dtypes = config["var_dtypes"]
+    try:
+        # Validate inputs
+        logger.info("Validating inputs...")
+        validate_file_exists(config_file, "Configuration file")
+        validate_file_exists(evaluation_dataset, "Evaluation dataset file")
+        validate_file_exists(model_file, "Model file")
+        
+        # Load configuration
+        logger.info("Loading configuration...")
+        config = load_yaml_config(config_file)["evaluate"]
+        target_column = config["target_column"]
+        shuffle = config["shuffle"]
+        shuffle_random_state = config["shuffle_random_state"]
+        var_dtypes = config["var_dtypes"]
 
-    # Loading dataset
-    logger.info("Loading and splitting the dataset...")
-    X, y = prepare_features_and_target(
-        evaluation_dataset,
-        target_column,
-        shuffle,
-        shuffle_random_state,
-        var_dtypes=var_dtypes,
-    )
-    logger.info(f"Dataset X shape: {X.shape}")
-    logger.info(f"Dataset y shape: {y.shape}")
+        # Loading dataset
+        logger.info("Loading and splitting the dataset...")
+        X, y = prepare_features_and_target(
+            evaluation_dataset,
+            target_column,
+            shuffle,
+            shuffle_random_state,
+            var_dtypes=var_dtypes,
+        )
+        
+        # Validate data
+        validate_data_shapes_match(X, y)
+        logger.info(f"Dataset X shape: {X.shape}")
+        logger.info(f"Dataset y shape: {y.shape}")
 
-    # Load the trained model
-    logger.info("Loading the trained model...")
-    model = load_pickle_file(model_file)
+        # Load the trained model
+        logger.info("Loading the trained model...")
+        model = load_pickle_file(model_file)
+        
+    except ValidationError as e:
+        logger.error(f"Validation error: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Error during evaluation initialization: {e}")
+        raise
+    
+    # Load scaler if provided
+    scaler = None
+    if scaler_path and Path(scaler_path).exists():
+        logger.info("Loading scaler...")
+        scaler = load_pickle_file(scaler_path)
+    else:
+        logger.warning("No scaler provided or scaler file not found. Using unscaled data.")
 
     # Evaluate the model
     logger.info("Evaluating the model...")
@@ -91,6 +118,12 @@ if __name__ == "__main__":
         type=str,
         help="Output JSON file for evaluation metrics",
     )
+    parser.add_argument(
+        "--scaler_path",
+        type=str,
+        help="Path to the fitted scaler",
+        default="models/scaler.pkl",
+    )
 
     args = parser.parse_args()
 
@@ -99,4 +132,5 @@ if __name__ == "__main__":
         model_file=args.model_file,
         evaluation_dataset=args.evaluation_dataset,
         output_metrics=args.output_metrics,
+        scaler_path=args.scaler_path,
     )

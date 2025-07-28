@@ -44,8 +44,11 @@ This is a master's thesis project analyzing air quality, health outcomes, and so
 - DVC-managed pipeline defined in `dvc.yaml` with stages: preprocess → train → evaluate
 - Configuration driven via `params.yaml` with YAML anchors for shared parameters
 - Base model class pattern for different algorithms (linear regression, random forest)
+- Model registry system for extensible model management
+- Configurable metrics and hyperparameters via `params.yaml`
 - Preprocessing handles feature selection, categorical encoding, train/test splits
 - Model evaluation generates metrics to `metrics/evaluation.json`
+- Scaler persistence for consistent data preprocessing
 
 **Web Application (`src/app/`)**
 - Flask application for model serving
