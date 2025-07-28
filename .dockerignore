@@ -1,0 +1,70 @@
+# Git and version control
+.git
+.gitignore
+.dvc
+.dvcignore
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+.venv
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation and README files
+README.md
+*.md
+docs/
+
+# Test files and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+
+# Jupyter notebooks (optional)
+*.ipynb
+notebooks/
+
+# Large data files (use volumes instead)
+*.csv
+*.json
+*.pkl
+data/
+models/
+metrics/
+
+# Docker files (don't copy into containers)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/

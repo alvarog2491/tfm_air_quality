@@ -1,0 +1,18 @@
+# ETL Pipeline Dependencies
+pandas==2.3.0
+numpy==2.3.1
+PyYAML==6.0.2
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2
+
+# Logging and configuration
+colorama==0.4.6
+
+# Data processing
+requests==2.32.4
+urllib3==2.5.0
+certifi==2025.6.15
+
+# File handling
+pathlib

@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # ETL Pipeline Service
+  etl:
+    build:
+      context: .
+      dockerfile: src/etl_pipeline/Dockerfile
+    container_name: tfm_etl_pipeline
+    volumes:
+      # Raw data input (read-only)
+      - ./src/etl_pipeline/data/air_quality_data/raw:/app/src/etl_pipeline/data/air_quality_data/raw:ro
+      - ./src/etl_pipeline/data/health_data/raw:/app/src/etl_pipeline/data/health_data/raw:ro
+      - ./src/etl_pipeline/data/socioeconomic_data/raw:/app/src/etl_pipeline/data/socioeconomic_data/raw:ro
+      
+      # Processed data output (shared with modeling)
+      - ./src/etl_pipeline/data/output:/app/src/etl_pipeline/data/output
+      - ./data:/app/data
+      
+      # Logs
+      - ./logs/etl:/app/logs
+      
+      # Configuration
+      - ./src/etl_pipeline/utils/unified_province_name.json:/app/src/etl_pipeline/utils/unified_province_name.json:ro
+    environment:
+      - PYTHONPATH=/app/src:/app/src/etl_pipeline
+    networks:
+      - tfm_network
+    profiles:
+      - etl
+      - full
+
+  # Modeling Pipeline Service  
+  modeling:
+    build:
+      context: .
+      dockerfile: src/modeling/Dockerfile
+    container_name: tfm_modeling_pipeline
+    depends_on:
+      - etl
+    volumes:
+      # Input data from ETL (read-only)
+      - ./src/etl_pipeline/data/output:/app/src/etl_pipeline/data/output:ro
+      - ./data:/app/data
+      
+      # Model artifacts output (shared with app)
+      - ./models:/app/models
+      - ./metrics:/app/metrics
+      
+      # Logs
+      - ./logs/modeling:/app/logs
+      
+      # DVC cache (optional, for persistence)
+      - dvc_cache:/app/.dvc/cache
+    environment:
+      - PYTHONPATH=/app/src
+      - DVC_NO_ANALYTICS=1
+    networks:
+      - tfm_network
+    profiles:
+      - modeling
+      - full
+
+  # Flask Application Service
+  app:
+    build:
+      context: .
+      dockerfile: src/app/Dockerfile
+    container_name: tfm_flask_app
+    depends_on:
+      - modeling
+    ports:
+      - "5000:5000"
+    volumes:
+      # Model artifacts from modeling (read-only)
+      - ./models:/app/models:ro
+      
+      # Logs
+      - ./logs/app:/app/logs
+    environment:
+      - PYTHONPATH=/app/src
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    networks:
+      - tfm_network
+    profiles:
+      - app
+      - full
+    restart: unless-stopped
+
+  # Optional: Monitoring service
+  monitoring:
+    image: nginx:alpine
+    container_name: tfm_monitoring
+    ports:
+      - "8080:80"
+    volumes:
+      - ./monitoring/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./logs:/usr/share/nginx/html/logs:ro
+    depends_on:
+      - app
+    networks:
+      - tfm_network
+    profiles:
+      - monitoring
+      - full
+
+# Shared volumes
+volumes:
+  dvc_cache:
+    driver: local
+
+# Network for service communication
+networks:
+  tfm_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
