@@ -3,7 +3,7 @@ Model Registry for managing different model types in the ML pipeline.
 """
 from typing import Dict, Type
 import logging
-from base_model import BaseModel
+from modeling.base_model import BaseModel
 
 # Use a simple logger without stage formatting to avoid conflicts
 logger = logging.getLogger("ModelRegistry")
@@ -85,7 +85,7 @@ def get_model(model_type: str, metrics_config: dict = None, hyperparameters: dic
 def _register_available_models():
     """Auto-register all available model implementations."""
     try:
-        from linear_regression.linear_regression import LinearRegressionModel
+        from modeling.linear_regression.linear_regression import LinearRegressionModel
         ModelRegistry.register("linear_regression", LinearRegressionModel)
         logger.info("Successfully registered linear_regression model")
     except ImportError as e:
@@ -96,7 +96,7 @@ def _register_available_models():
         raise
     
     try:
-        from random_forest.random_forest import RandomForestModel
+        from modeling.random_forest.random_forest import RandomForestModel
         ModelRegistry.register("random_forest", RandomForestModel)
         logger.info("Successfully registered random_forest model")
     except ImportError as e:

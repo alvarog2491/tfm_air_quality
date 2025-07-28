@@ -3,7 +3,7 @@ import pandas as pd
 from unittest.mock import patch, MagicMock
 import tempfile
 import os
-from src.modeling.preprocess import main
+from modeling.preprocess import main
 
 
 @pytest.fixture
@@ -56,13 +56,15 @@ def temp_files():
 class TestMain:
     """Test suite for the main preprocess function"""
 
-    @patch("src.modeling.preprocess.load_yaml_config")
-    @patch("src.modeling.preprocess.load_raw_dataset")
-    @patch("src.modeling.preprocess.separate_train_evaluate_dataset")
-    @patch("src.modeling.preprocess.validate_no_missing_values")
-    @patch("src.modeling.preprocess.one_hot_encode_categorical_features")
-    @patch("src.modeling.preprocess.scale_numerical_features")
-    @patch("src.modeling.preprocess.logger")
+    @patch("modeling.preprocess.joblib.dump")
+    @patch("modeling.preprocess.validate_file_exists")
+    @patch("modeling.preprocess.load_yaml_config")
+    @patch("modeling.preprocess.load_raw_dataset")
+    @patch("modeling.preprocess.separate_train_evaluate_dataset")
+    @patch("modeling.preprocess.validate_no_missing_values")
+    @patch("modeling.preprocess.one_hot_encode_categorical_features")
+    @patch("modeling.preprocess.scale_numerical_features")
+    @patch("modeling.preprocess.logger")
     def test_main_successful_execution(
         self,
         mock_logger,
@@ -72,6 +74,8 @@ class TestMain:
         mock_separate_dataset,
         mock_load_dataset,
         mock_load_config,
+        mock_validate_file_exists,
+        mock_joblib_dump,
         mock_config,
         mock_dataset,
         temp_files,
@@ -113,11 +117,12 @@ class TestMain:
         assert os.path.exists(temp_files["output_train"])
         assert os.path.exists(temp_files["output_test"])
 
-    @patch("src.modeling.preprocess.load_yaml_config")
-    @patch("src.modeling.preprocess.load_raw_dataset")
-    @patch("src.modeling.preprocess.logger")
+    @patch("modeling.preprocess.validate_file_exists")
+    @patch("modeling.preprocess.load_yaml_config")
+    @patch("modeling.preprocess.load_raw_dataset")
+    @patch("modeling.preprocess.logger")
     def test_main_handles_config_loading_error(
-        self, mock_logger, mock_load_dataset, mock_load_config, temp_files
+        self, mock_logger, mock_load_dataset, mock_load_config, mock_validate_file_exists, temp_files
     ):
         """Test main function handles configuration loading errors properly"""
 
@@ -133,11 +138,12 @@ class TestMain:
                 output_test_dataset=temp_files["output_test"],
             )
 
-    @patch("src.modeling.preprocess.load_yaml_config")
-    @patch("src.modeling.preprocess.load_raw_dataset")
-    @patch("src.modeling.preprocess.logger")
+    @patch("modeling.preprocess.validate_file_exists")
+    @patch("modeling.preprocess.load_yaml_config")
+    @patch("modeling.preprocess.load_raw_dataset")
+    @patch("modeling.preprocess.logger")
     def test_main_handles_dataset_loading_error(
-        self, mock_logger, mock_load_dataset, mock_load_config, mock_config, temp_files
+        self, mock_logger, mock_load_dataset, mock_load_config, mock_validate_file_exists, mock_config, temp_files
     ):
         """Test main function handles dataset loading errors properly"""
 
@@ -154,13 +160,15 @@ class TestMain:
                 output_test_dataset=temp_files["output_test"],
             )
 
-    @patch("src.modeling.preprocess.load_yaml_config")
-    @patch("src.modeling.preprocess.load_raw_dataset")
-    @patch("src.modeling.preprocess.separate_train_evaluate_dataset")
-    @patch("src.modeling.preprocess.validate_no_missing_values")
-    @patch("src.modeling.preprocess.one_hot_encode_categorical_features")
-    @patch("src.modeling.preprocess.scale_numerical_features")
-    @patch("src.modeling.preprocess.logger")
+    @patch("modeling.preprocess.joblib.dump")
+    @patch("modeling.preprocess.validate_file_exists")
+    @patch("modeling.preprocess.load_yaml_config")
+    @patch("modeling.preprocess.load_raw_dataset")
+    @patch("modeling.preprocess.separate_train_evaluate_dataset")
+    @patch("modeling.preprocess.validate_no_missing_values")
+    @patch("modeling.preprocess.one_hot_encode_categorical_features")
+    @patch("modeling.preprocess.scale_numerical_features")
+    @patch("modeling.preprocess.logger")
     def test_main_calls_functions_with_correct_parameters(
         self,
         mock_logger,
@@ -170,6 +178,8 @@ class TestMain:
         mock_separate_dataset,
         mock_load_dataset,
         mock_load_config,
+        mock_validate_file_exists,
+        mock_joblib_dump,
         mock_config,
         mock_dataset,
         temp_files,
@@ -220,13 +230,15 @@ class TestMain:
             df=train_df, numerical_features=expected_numerical, scaler=None
         )
 
-    @patch("src.modeling.preprocess.load_yaml_config")
-    @patch("src.modeling.preprocess.load_raw_dataset")
-    @patch("src.modeling.preprocess.separate_train_evaluate_dataset")
-    @patch("src.modeling.preprocess.validate_no_missing_values")
-    @patch("src.modeling.preprocess.one_hot_encode_categorical_features")
-    @patch("src.modeling.preprocess.scale_numerical_features")
-    @patch("src.modeling.preprocess.logger")
+    @patch("modeling.preprocess.joblib.dump")
+    @patch("modeling.preprocess.validate_file_exists")
+    @patch("modeling.preprocess.load_yaml_config")
+    @patch("modeling.preprocess.load_raw_dataset")
+    @patch("modeling.preprocess.separate_train_evaluate_dataset")
+    @patch("modeling.preprocess.validate_no_missing_values")
+    @patch("modeling.preprocess.one_hot_encode_categorical_features")
+    @patch("modeling.preprocess.scale_numerical_features")
+    @patch("modeling.preprocess.logger")
     def test_main_logger_calls(
         self,
         mock_logger,
@@ -236,6 +248,8 @@ class TestMain:
         mock_separate_dataset,
         mock_load_dataset,
         mock_load_config,
+        mock_validate_file_exists,
+        mock_joblib_dump,
         mock_config,
         mock_dataset,
         temp_files,

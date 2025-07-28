@@ -1,18 +1,24 @@
-from base_model import BaseModel
+from modeling.base_model import BaseModel
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from typing import Dict, Any
 
 
 class LinearRegressionModel(BaseModel):
-    def __init__(self, metrics_config: Dict[str, Any] = None, hyperparameters: Dict[str, Any] = None):
+    def __init__(
+        self,
+        metrics_config: Dict[str, Any] = None,
+        hyperparameters: Dict[str, Any] = None,
+    ):
         super().__init__(metrics_config, hyperparameters)
-        
+
         # Apply hyperparameters to LinearRegression
         lr_params = self.hyperparameters.copy()
         # Remove any parameters that sklearn.LinearRegression doesn't accept
-        lr_params.pop('normalize', None)  # 'normalize' is deprecated in newer sklearn versions
-        
+        lr_params.pop(
+            "normalize", None
+        )  # 'normalize' is deprecated in newer sklearn versions
+
         self.pipeline = Pipeline([("regressor", LinearRegression(**lr_params))])
 
     def train(self, X_train, y_train):
@@ -23,31 +29,33 @@ class LinearRegressionModel(BaseModel):
 
     def evaluate(self, X_test, y_test):
         from sklearn.metrics import (
-            mean_squared_error, r2_score, mean_absolute_error, 
-            mean_absolute_percentage_error
+            mean_squared_error,
+            r2_score,
+            mean_absolute_error,
+            mean_absolute_percentage_error,
         )
         import numpy as np
 
         predictions = self.predict(X_test)
-        
+
         # Get configured metrics or use defaults
         enabled_metrics = self.metrics_config.get("enabled_metrics", ["mse", "r2"])
-        
+
         metrics = {}
-        
+
         if "mse" in enabled_metrics:
             metrics["mse"] = mean_squared_error(y_test, predictions)
-        
+
         if "rmse" in enabled_metrics:
             metrics["rmse"] = np.sqrt(mean_squared_error(y_test, predictions))
-        
+
         if "mae" in enabled_metrics:
             metrics["mae"] = mean_absolute_error(y_test, predictions)
-        
+
         if "mape" in enabled_metrics:
             metrics["mape"] = mean_absolute_percentage_error(y_test, predictions)
-        
+
         if "r2" in enabled_metrics:
             metrics["r2"] = r2_score(y_test, predictions)
-        
+
         return metrics

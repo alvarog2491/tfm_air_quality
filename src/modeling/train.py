@@ -72,7 +72,7 @@ def main(
     # Train and evaluate the model
     logger.info("Training and evaluating the model...")
     logger.info(f"Using hyperparameters: {model_hyperparameters}")
-    from model_registry import get_model
+    from modeling.model_registry import get_model
 
     model = get_model(model_type, metrics_config, model_hyperparameters)
     model.train(X_train, y_train)

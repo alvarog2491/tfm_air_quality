@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 import joblib
 
-from src.modeling.train import main
+from modeling.train import main
 
 
 @pytest.fixture
@@ -42,8 +42,8 @@ def sample_processed_dataset():
 class TestTrainIntegration:
     """Integration tests for the training pipeline."""
 
-    @patch("src.modeling.train.load_yaml_config")
-    @patch("src.modeling.train.prepare_features_and_target")
+    @patch("modeling.train.load_yaml_config")
+    @patch("modeling.train.prepare_features_and_target")
     def test_train_pipeline_end_to_end(
         self, mock_prepare_features, mock_load_config, 
         sample_config, sample_processed_dataset, tmp_path
@@ -83,8 +83,8 @@ class TestTrainIntegration:
         assert len(predictions) == len(X)
         assert predictions.dtype in ['float64', 'float32']
 
-    @patch("src.modeling.train.load_yaml_config")
-    @patch("src.modeling.train.prepare_features_and_target")
+    @patch("modeling.train.load_yaml_config")
+    @patch("modeling.train.prepare_features_and_target")
     def test_train_with_scaler_persistence(
         self, mock_prepare_features, mock_load_config,
         sample_config, sample_processed_dataset, tmp_path
@@ -127,7 +127,7 @@ class TestTrainIntegration:
         assert model_output.exists()
         assert (tmp_path / "models" / "scaler.pkl").exists()
 
-    @patch("src.modeling.train.load_yaml_config")
+    @patch("modeling.train.load_yaml_config")
     def test_train_validation_errors(self, mock_load_config, tmp_path):
         """Test that validation errors are properly handled."""
         
@@ -151,8 +151,8 @@ class TestTrainIntegration:
                 output_model="model.pkl"
             )
 
-    @patch("src.modeling.train.load_yaml_config")
-    @patch("src.modeling.train.prepare_features_and_target")
+    @patch("modeling.train.load_yaml_config")
+    @patch("modeling.train.prepare_features_and_target")
     def test_train_metrics_configuration(
         self, mock_prepare_features, mock_load_config,
         sample_processed_dataset, tmp_path
