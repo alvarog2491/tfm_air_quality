@@ -1,12 +1,12 @@
 """
-Model Registry for managing different model types in the ML pipeline.
+Model Factory for creating different model types in the ML pipeline using the Factory pattern.
 """
 from typing import Dict, Type
 import logging
 from modeling.base_model import BaseModel
 
 # Use a simple logger without stage formatting to avoid conflicts
-logger = logging.getLogger("ModelRegistry")
+logger = logging.getLogger("ModelFactory")
 logger.setLevel(logging.INFO)
 
 # Only add handler if not already present
@@ -66,7 +66,7 @@ class ModelRegistry:
         return list(cls._models.keys())
 
 
-def get_model(model_type: str, metrics_config: dict = None, hyperparameters: dict = None) -> BaseModel:
+def create_model(model_type: str, metrics_config: dict = None, hyperparameters: dict = None) -> BaseModel:
     """
     Convenience function to get a model instance.
     
