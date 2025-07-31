@@ -15,6 +15,7 @@ class ETLStep(ABC):
     def __init__(self, name: str):
         self.name = name
         self.logger = logging.getLogger(self.__class__.__name__)
+        self._recovery_enabled = True  # Enable recovery by default
 
     @abstractmethod
     def execute(
@@ -35,3 +36,8 @@ class ETLStep(ABC):
         if message:
             msg += f": {message}"
         self.logger.info(msg)
+
+    @property
+    def recovery_enabled(self) -> bool:
+        """Check if recovery is enabled for this step."""
+        return self._recovery_enabled

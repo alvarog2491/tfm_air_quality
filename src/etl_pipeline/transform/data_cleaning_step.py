@@ -14,6 +14,16 @@ class DataCleaningStep(ETLStep):
 
     def __init__(self):
         super().__init__(__name__)
+        
+        # Try to load configuration, fall back to defaults if not available
+        try:
+            from config.config_manager import get_config
+            self.config = get_config()
+            self.processing_config = self.config.get_processing_config()
+        except ImportError:
+            self.logger.warning("Configuration manager not available, using hardcoded values")
+            self.config = None
+            self.processing_config = {}
 
     def execute(
         self, dataframes: Dict[str, pd.DataFrame], context: Dict[str, Any]
@@ -47,38 +57,45 @@ class DataCleaningStep(ETLStep):
 
     def _remove_island_observations(self, df: pd.DataFrame) -> None:
         """
-        Remove rows corresponding to island provinces.
+        Remove rows corresponding to excluded regions from configuration.
 
         Args:
             df (pd.DataFrame): DataFrame to filter.
         """
-        islands = [
-            "Santa Cruz de Tenerife",
-            "Las Palmas",
-            "Illes Balears",
-            "Ceuta",
-            "Melilla",
-        ]
+        excluded_regions = self.processing_config.get("excluded_regions", [])
+        
+        if not excluded_regions:
+            self.logger.warning("No excluded regions configured, skipping region filtering")
+            return
+        
         before = len(df)
-        df.drop(df[df["Province"].isin(islands)].index, inplace=True)  # type: ignore
+        df.drop(df[df["Province"].isin(excluded_regions)].index, inplace=True)  # type: ignore
         removed = before - len(df)
-        self.logger.info(f"Removed {removed} island observations")
+        self.logger.info(f"Removed {removed} records from excluded regions: {excluded_regions}")
 
     def _filter_timeframe(self, df: pd.DataFrame) -> None:
         """
-        Filter rows to keep only those where 'Year' is between 2000 and 2021 (inclusive).
+        Filter rows to keep only those within the configured time range.
 
         Args:
             df (pd.DataFrame): DataFrame to filter.
         """
+        time_range = self.processing_config.get("time_range", {})
+        start_year = time_range.get("start_year")
+        end_year = time_range.get("end_year")
+        
+        if not start_year or not end_year:
+            self.logger.warning("No time range configured, skipping timeframe filtering")
+            return
+        
         before = len(df)
         if pd.api.types.is_datetime64_any_dtype(df["Year"]):
-            mask = df["Year"].dt.year.between(2000, 2021)  # type: ignore
+            mask = df["Year"].dt.year.between(start_year, end_year)  # type: ignore
         else:
-            mask = df["Year"].between(2000, 2021)  # type: ignore
+            mask = df["Year"].between(start_year, end_year)  # type: ignore
         df.drop(index=df[~mask].index, inplace=True)
         removed = before - len(df)
-        self.logger.info(f"Removed {removed} records outside 2000–2021 timeframe")
+        self.logger.info(f"Removed {removed} records outside {start_year}–{end_year} timeframe")
 
     def _handle_null_values(self, df: pd.DataFrame) -> None:
         """
