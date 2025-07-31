@@ -49,7 +49,7 @@ jobs:
     
     - name: Run Integration Tests
       run: |
-        pytest tests/integration/ -v --tb=short
+        pytest src/tests/integration/ -v --tb=short
     
     - name: Create test data for ETL pipeline
       run: |
