@@ -4,6 +4,11 @@ Flask==3.1.0
 # Machine learning inference
 pandas==2.3.0
 joblib==1.5.1
+scikit-learn==1.7.0
+PyYAML==6.0.2
 
 # HTTP utilities
 requests==2.32.4
+
+# Production WSGI server
+gunicorn==23.0.0

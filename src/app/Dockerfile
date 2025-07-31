@@ -16,6 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source code
 COPY src/app/ src/app/
 COPY src/common/ src/common/
+COPY src/modeling/ src/modeling/
+
+# Copy and make startup script executable
+COPY src/app/start_services.sh .
+RUN chmod +x start_services.sh
 
 # Set Python path
 ENV PYTHONPATH=/app/src
@@ -30,12 +35,12 @@ RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
 USER app
 
-# Expose Flask port
-EXPOSE 5000
+# Expose Flask ports
+EXPOSE 9001 9002
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD curl -f http://localhost:9001/ || exit 1
 
-# Default command - run Flask app
-CMD ["python", "src/app/main_app.py"]
+# Default command - run both services
+CMD ["./start_services.sh"]

@@ -65,10 +65,9 @@ services:
       context: .
       dockerfile: src/app/Dockerfile
     container_name: tfm_flask_app
-    depends_on:
-      - modeling
     ports:
-      - "5000:5000"
+      - "9001:9001"
+      - "9002:9002"
     volumes:
       # Model artifacts from modeling (read-only)
       - ./models:/app/models:ro
