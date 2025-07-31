@@ -53,7 +53,7 @@ jobs:
     
     - name: Create test data for ETL pipeline
       run: |
-        python tests/integration/create_test_data.py
+        python src/tests/integration/create_test_data.py
     
     - name: Run ETL Pipeline
       run: |
@@ -61,7 +61,7 @@ jobs:
     
     - name: Verify ETL Output
       run: |
-        python tests/integration/verify_etl_output.py
+        python src/tests/integration/verify_etl_output.py
     
     - name: Test Modeling Pipeline
       run: |
@@ -69,12 +69,12 @@ jobs:
     
     - name: Verify Modeling Output
       run: |
-        python tests/integration/verify_modeling_output.py
+        python src/tests/integration/verify_modeling_output.py
     
     - name: Test App Functionality
       run: |
-        python tests/integration/test_app_simple.py
+        python src/tests/integration/test_app_simple.py
     
     - name: Run End-to-End Integration Test
       run: |
-        pytest tests/integration/test_end_to_end.py -v --tb=short
+        pytest src/tests/integration/test_end_to_end.py -v --tb=short
