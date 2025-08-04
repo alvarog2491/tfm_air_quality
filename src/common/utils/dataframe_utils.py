@@ -51,6 +51,27 @@ def load_raw_dataset(
     return df
 
 
+def convert_to_dataframe_with_dtypes(
+    data: Dict[str, List],
+    var_dtypes: Dict[str, str],
+) -> pd.DataFrame:
+    """
+    Convert a dictionary of lists to a DataFrame with specified data types.
+
+    Args:
+        data (Dict[str, List]): Dictionary where keys are column names and values are lists of column values.
+        var_dtypes (Dict[str, str]): Dictionary mapping column names to their desired data types.
+
+    Returns:
+        pd.DataFrame: DataFrame with the specified data types applied to each column.
+    """
+    df = pd.DataFrame(data)
+    for column, dtype in var_dtypes.items():
+        if column in df.columns:
+            df[column] = df[column].astype(dtype)
+    return df
+
+
 def validate_no_missing_values(df: pd.DataFrame) -> None:
     """
     Raise an error if the DataFrame contains any missing values.
@@ -177,16 +198,17 @@ def log_memory_usage(df: pd.DataFrame) -> None:
     logging.info(f"(~{memory_usage:.1f} MB memory usage)")
 
 
-def validate_dataframe_columns(df: pd.DataFrame, required_columns: List[str], 
-                              df_name: str = "DataFrame") -> None:
+def validate_dataframe_columns(
+    df: pd.DataFrame, required_columns: List[str], df_name: str = "DataFrame"
+) -> None:
     """
     Validate that a DataFrame contains required columns.
-    
+
     Args:
         df: DataFrame to validate
         required_columns: List of required column names
         df_name: Name of the DataFrame for error messages
-        
+
     Raises:
         ValidationError: If required columns are missing
     """
@@ -201,11 +223,11 @@ def validate_dataframe_columns(df: pd.DataFrame, required_columns: List[str],
 def validate_dataframe_not_empty(df: pd.DataFrame, df_name: str = "DataFrame") -> None:
     """
     Validate that a DataFrame is not empty.
-    
+
     Args:
         df: DataFrame to validate
         df_name: Name of the DataFrame for error messages
-        
+
     Raises:
         ValidationError: If DataFrame is empty
     """
@@ -218,11 +240,11 @@ def validate_dataframe_not_empty(df: pd.DataFrame, df_name: str = "DataFrame") -
 def validate_data_shapes_match(X: pd.DataFrame, y: pd.Series) -> None:
     """
     Validate that features and target have matching number of samples.
-    
+
     Args:
         X: Features DataFrame
         y: Target Series
-        
+
     Raises:
         ValidationError: If shapes don't match
     """
@@ -236,20 +258,22 @@ def validate_data_shapes_match(X: pd.DataFrame, y: pd.Series) -> None:
 def validate_target_column(df: pd.DataFrame, target_column: str) -> None:
     """
     Validate that target column exists and has valid values.
-    
+
     Args:
         df: DataFrame containing the target column
         target_column: Name of the target column
-        
+
     Raises:
         ValidationError: If target column is invalid
     """
     validate_dataframe_columns(df, [target_column], "Dataset")
-    
+
     target_series = df[target_column]
     if target_series.isna().all():
-        raise ValidationError(f"Target column '{target_column}' contains only null values")
-    
+        raise ValidationError(
+            f"Target column '{target_column}' contains only null values"
+        )
+
     null_percentage = target_series.isna().sum() / len(target_series) * 100
     if null_percentage > 50:
         raise ValidationError(

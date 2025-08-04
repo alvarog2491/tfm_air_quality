@@ -1,7 +1,7 @@
 import json
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Union
 import logging
 
 import joblib
@@ -115,20 +115,21 @@ def save_pickle_file(data: Any, file_path: str) -> None:
 
 class ValidationError(Exception):
     """Custom exception for validation errors."""
+
     pass
 
 
 def validate_file_exists(file_path: str, description: str = "File") -> Path:
     """
     Validate that a file exists.
-    
+
     Args:
         file_path: Path to the file
         description: Description of the file for error messages
-        
+
     Returns:
         Path object if file exists
-        
+
     Raises:
         ValidationError: If file doesn't exist
     """
@@ -143,14 +144,14 @@ def validate_file_exists(file_path: str, description: str = "File") -> Path:
 def validate_directory_exists(dir_path: str, create_if_missing: bool = False) -> Path:
     """
     Validate that a directory exists, optionally creating it.
-    
+
     Args:
         dir_path: Path to the directory
         create_if_missing: Whether to create directory if it doesn't exist
-        
+
     Returns:
         Path object
-        
+
     Raises:
         ValidationError: If directory doesn't exist and create_if_missing is False
     """

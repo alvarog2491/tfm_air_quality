@@ -5,52 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Quality Prediction Service</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
-        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-row { display: flex; gap: 20px; }
+        .form-row .form-group { flex: 1; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        input:focus, select:focus { border-color: #007bff; outline: none; box-shadow: 0 0 5px rgba(0,123,255,0.3); }
+        button { background-color: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
         button:hover { background-color: #0056b3; }
-        .result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9; }
+        .result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 4px; }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; }
+        .section-title { color: #007bff; font-size: 18px; font-weight: bold; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Air Quality Prediction Service</h1>
-        <p>Enter data to get air quality predictions.</p>
         
-        <div class="form-group">
-            <button onclick="testPrediction()">Test Prediction Service</button>
-        </div>
+        <form action="/predict" method="POST">
+            <div class="section-title">Air Quality Data</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="air_pollutant">Air Pollutant:</label>
+                    <input type="text" id="air_pollutant" name="air_pollutant" value="no2" required>
+                </div>
+                <div class="form-group">
+                    <label for="air_pollutant_description">Air Pollutant Description:</label>
+                    <input type="text" id="air_pollutant_description" name="air_pollutant_description" value="Nitrogen dioxide (air)" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="data_aggregation_process">Data Aggregation Process:</label>
+                    <input type="text" id="data_aggregation_process" name="data_aggregation_process" value="Annual mean / 1 calendar year" required>
+                </div>
+                <div class="form-group">
+                    <label for="year">Year:</label>
+                    <input type="date" id="year" name="year" value="2000-01-01" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="air_pollution_level">Air Pollution Level:</label>
+                    <input type="number" step="0.001" id="air_pollution_level" name="air_pollution_level" value="37.381" required>
+                </div>
+                <div class="form-group">
+                    <label for="unit_of_air_pollution_level">Unit Of Air Pollution Level:</label>
+                    <input type="text" id="unit_of_air_pollution_level" name="unit_of_air_pollution_level" value="ug/m3" required>
+                </div>
+            </div>
+            
+            <div class="section-title">Station Information</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="air_quality_station_type">Air Quality Station Type:</label>
+                    <select id="air_quality_station_type" name="air_quality_station_type" required>
+                        <option value="Traffic" selected>Traffic</option>
+                        <option value="Background">Background</option>
+                        <option value="Industrial">Industrial</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="air_quality_station_area">Air Quality Station Area:</label>
+                    <select id="air_quality_station_area" name="air_quality_station_area" required>
+                        <option value="urban" selected>Urban</option>
+                        <option value="suburban">Suburban</option>
+                        <option value="rural">Rural</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="section-title">Geographic Information</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="longitude">Longitude:</label>
+                    <input type="number" step="0.0001" id="longitude" name="longitude" value="-3.6839" required>
+                </div>
+                <div class="form-group">
+                    <label for="latitude">Latitude:</label>
+                    <input type="number" step="0.0001" id="latitude" name="latitude" value="41.6711" required>
+                </div>
+                <div class="form-group">
+                    <label for="altitude">Altitude:</label>
+                    <input type="number" step="0.1" id="altitude" name="altitude" value="865.0" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="province">Province:</label>
+                    <input type="text" id="province" name="province" value="Burgos" required>
+                </div>
+                <div class="form-group">
+                    <label for="quality">Quality:</label>
+                    <select id="quality" name="quality" required>
+                        <option value="BUENA" selected>BUENA</option>
+                        <option value="REGULAR">REGULAR</option>
+                        <option value="MALA">MALA</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="section-title">Health & Socioeconomic Data</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="life_expectancy_total">Life Expectancy Total:</label>
+                    <input type="number" step="0.01" id="life_expectancy_total" name="life_expectancy_total" value="80.47" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pib">PIB (GDP):</label>
+                    <input type="number" step="0.001" id="pib" name="pib" value="17.824" required>
+                </div>
+                <div class="form-group">
+                    <label for="population">Population:</label>
+                    <input type="number" id="population" name="population" value="347241" required>
+                </div>
+                <div class="form-group">
+                    <label for="respiratory_deaths_per_100k">Respiratory Deaths per 100k:</label>
+                    <input type="number" step="0.01" id="respiratory_deaths_per_100k" name="respiratory_deaths_per_100k" value="116.06" required>
+                </div>
+            </div>
+            
+            <div class="form-group" style="text-align: center; margin-top: 30px;">
+                <button type="submit">Get Prediction</button>
+            </div>
+        </form>
         
         <div id="result" class="result" style="display: none;"></div>
     </div>
-
-    <script>
-        async function testPrediction() {
-            const resultDiv = document.getElementById('result');
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = 'Testing prediction service...';
-            
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        // Sample test data - adjust based on your model's expected features
-                        test: 'data'
-                    })
-                });
-                
-                const data = await response.json();
-                resultDiv.innerHTML = `<h3>Response:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
-            } catch (error) {
-                resultDiv.innerHTML = `<h3>Error:</h3><p>${error.message}</p>`;
-            }
-        }
-    </script>
 </body>
 </html>

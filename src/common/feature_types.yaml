@@ -1,0 +1,52 @@
+preprocess:
+  categorical_features:
+    - name: Air Pollutant
+      categories: [example1, example2]
+    - name: Air Pollutant Description
+      categories: [example1, example2]
+    - name: Data Aggregation Process
+      categories: [example1, example2]
+    - name: Unit Of Air Pollution Level
+      categories: [example1, example2]
+    - name: Air Quality Station Type
+      categories: [example1, example2]
+    - name: Air Quality Station Area
+      categories: [example1, example2]
+    - name: Province
+      categories: [example1, example2]
+    - name: Quality
+      categories: [example1, example2]
+
+  numerical_features:
+    - Year
+    - Air Pollution Level
+    - Longitude
+    - Latitude
+    - Altitude
+    - Population
+    - Respiratory_diseases_total
+    - Life_expectancy_total
+    - pib
+    - respiratory_deaths_per_100k
+
+  drop_colnames: []
+
+  var_dtypes:
+    Air Pollutant: category
+    Air Pollutant Description: category
+    Data Aggregation Process: category
+    Year: int64
+    Air Pollution Level: float64
+    Unit Of Air Pollution Level: category
+    Air Quality Station Type: category
+    Air Quality Station Area: category
+    Longitude: float64
+    Latitude: float64
+    Altitude: float64
+    Province: category
+    Quality: category
+    Respiratory_diseases_total: int64
+    Life_expectancy_total: float64
+    pib: float64
+    Population: int64
+    respiratory_deaths_per_100k: float64

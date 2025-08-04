@@ -85,7 +85,7 @@ services:
       - full
     restart: unless-stopped
 
-  # Optional: Monitoring service
+  # Monitoring service
   monitoring:
     image: nginx:alpine
     container_name: tfm_monitoring

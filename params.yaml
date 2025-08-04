@@ -28,16 +28,16 @@ common_dtypes: &common_dtypes
   Air Pollutant: "category"
   Air Pollutant Description: "category"
   Data Aggregation Process: "category"
-  Air Pollution Level: "float"
+  Air Pollution Level: "float64"
   Unit Of Air Pollution Level: "category"
   Air Quality Station Type: "category"
   Air Quality Station Area: "category"
-  Altitude: "float"
+  Altitude: "float64"
   Province: "category"
   Quality: "category"
-  Respiratory_diseases_total: "float"
-  Life_expectancy_total: "float"
-  pib: "float"
+  Respiratory_diseases_total: "float64"
+  Life_expectancy_total: "float64"
+  pib: "float64"
 
 # Sections using aliases (*)
 preprocess:

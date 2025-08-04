@@ -23,7 +23,7 @@ python src/modeling/evaluate.py params.yaml models/model.pkl data/processed_test
 pytest
 
 # Start web application for model serving
-python src/app/main_app.py
+python src/app/app.py
 ```
 
 ## Architecture Overview

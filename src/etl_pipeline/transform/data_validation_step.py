@@ -220,7 +220,7 @@ class DataValidationStep(ETLStep):
             end_year = time_range.get("end_year", 2021)
 
             invalid_years = df[
-                (df["Year"].dt.year < start_year) | (df["Year"].dt.year > end_year)
+                (df["Year"] < start_year) | (df["Year"] > end_year)
             ]
             if len(invalid_years) > 0:
                 results["warnings"].append(
